@@ -1,0 +1,15 @@
+[project]
+name = "test-mcp"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastmcp>=2.12.4",
+    "ipdb>=0.13.13",
+    "mcp[cli]>=1.17.0",
+    "sentry-sdk",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }
