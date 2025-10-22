@@ -1823,7 +1823,7 @@ wheels = [
 
 [[package]]
 name = "sentry-sdk"
-version = "2.40.0"
+version = "2.41.0"
 source = { editable = "../../sentry-python" }
 dependencies = [
     { name = "certifi" },
@@ -1851,6 +1851,7 @@ requires-dist = [
     { name = "falcon", marker = "extra == 'falcon'", specifier = ">=1.4" },
     { name = "fastapi", marker = "extra == 'fastapi'", specifier = ">=0.79.0" },
     { name = "flask", marker = "extra == 'flask'", specifier = ">=0.11" },
+    { name = "google-genai", marker = "extra == 'google-genai'", specifier = ">=1.29.0" },
     { name = "grpcio", marker = "extra == 'grpcio'", specifier = ">=1.21.1" },
     { name = "httpcore", extras = ["http2"], marker = "extra == 'http2'", specifier = "==1.*" },
     { name = "httpx", marker = "extra == 'httpx'", specifier = ">=0.16.0" },
@@ -1869,6 +1870,7 @@ requires-dist = [
     { name = "opentelemetry-distro", marker = "extra == 'opentelemetry-experimental'" },
     { name = "protobuf", marker = "extra == 'grpcio'", specifier = ">=3.8.0" },
     { name = "pure-eval", marker = "extra == 'pure-eval'" },
+    { name = "pydantic-ai", marker = "extra == 'pydantic-ai'", specifier = ">=1.0.0" },
     { name = "pymongo", marker = "extra == 'pymongo'", specifier = ">=3.1" },
     { name = "pyspark", marker = "extra == 'pyspark'", specifier = ">=2.4.4" },
     { name = "quart", marker = "extra == 'quart'", specifier = ">=0.16.1" },
@@ -1883,7 +1885,7 @@ requires-dist = [
     { name = "unleashclient", marker = "extra == 'unleash'", specifier = ">=6.0.1" },
     { name = "urllib3", specifier = ">=1.26.11" },
 ]
-provides-extras = ["aiohttp", "anthropic", "arq", "asyncpg", "beam", "bottle", "celery", "celery-redbeat", "chalice", "clickhouse-driver", "django", "falcon", "fastapi", "flask", "grpcio", "http2", "httpx", "huey", "huggingface-hub", "langchain", "langgraph", "launchdarkly", "litellm", "litestar", "loguru", "openai", "openfeature", "opentelemetry", "opentelemetry-experimental", "pure-eval", "pymongo", "pyspark", "quart", "rq", "sanic", "sqlalchemy", "starlette", "starlite", "statsig", "tornado", "unleash"]
+provides-extras = ["aiohttp", "anthropic", "arq", "asyncpg", "beam", "bottle", "celery", "celery-redbeat", "chalice", "clickhouse-driver", "django", "falcon", "fastapi", "flask", "grpcio", "http2", "httpx", "huey", "huggingface-hub", "langchain", "langgraph", "launchdarkly", "litellm", "litestar", "loguru", "openai", "openfeature", "opentelemetry", "opentelemetry-experimental", "pure-eval", "pydantic-ai", "pymongo", "pyspark", "quart", "rq", "sanic", "sqlalchemy", "starlette", "starlite", "statsig", "tornado", "unleash", "google-genai"]
 
 [[package]]
 name = "six"
@@ -1983,7 +1985,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "ipdb", specifier = ">=0.13.13" },
-    { name = "pydantic-ai", specifier = ">=0.0.14" },
+    { name = "pydantic-ai", extras = ["mcp"], specifier = ">=0.0.14" },
     { name = "sentry-sdk", editable = "../../sentry-python" },
 ]
 

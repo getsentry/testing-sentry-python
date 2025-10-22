@@ -1,185 +1,164 @@
-"""
-Simple, focused agents for testing Pydantic AI integration with Sentry.
-"""
+"""Agent factory functions for Pydantic AI testing."""
 
 from pydantic_ai import Agent
+from pydantic_ai.mcp import MCPServerStdio
 from pydantic import BaseModel
+from dataclasses import dataclass
 
+
+# ============================================================================
+# Data Models
+# ============================================================================
 
 class CalculationResult(BaseModel):
     """Result from mathematical calculations."""
+    result: float
+    operation: str
+    explanation: str
+
+
+class CustomerSupportResponse(BaseModel):
+    """Response from customer support agent."""
+    response: str
+    customer_tier: str
+    action_taken: str
+
+
+class MCPCalculationResult(BaseModel):
+    """Result from MCP-based calculations."""
     result: int
     operation: str
     explanation: str
 
 
-class AnalysisResult(BaseModel):
-    """Result from data analysis."""
-    summary: str
-    key_findings: list[str]
-    recommendation: str
+@dataclass
+class CustomerContext:
+    """Structured context data for customer support agent."""
+    customer_id: str
+    name: str
+    tier: str
+    account_balance: float
+    open_tickets: int
+    last_purchase_days_ago: int
 
 
-# Simple agent without tools
-simple_agent = Agent(
-    "openai:gpt-4o-mini",
-    name="simple_agent",
-    instructions="You are a helpful assistant. Provide clear, concise answers.",
-    model_settings={
-        "temperature": 0.3,
-        "max_tokens": 200,
-    },
-)
+# ============================================================================
+# Agent Factory Functions
+# ============================================================================
 
-
-# Agent with mathematical tools
-math_agent = Agent(
-    "openai:gpt-4o-mini",
-    name="math_agent",
-    instructions="You are a mathematical assistant. Use the available tools to perform calculations and return structured results.",
-    output_type=CalculationResult,
-    model_settings={
-        "temperature": 0.1,
-        "max_tokens": 300,
-    },
-)
-
-
-@math_agent.tool_plain
-def add(a: int, b: int) -> int:
-    """Add two numbers together."""
-    return a + b
-
-
-@math_agent.tool_plain
-def multiply(a: int, b: int) -> int:
-    """Multiply two numbers together."""
-    return a * b
-
-
-@math_agent.tool_plain
-def calculate_percentage(part: float, total: float) -> float:
-    """Calculate what percentage 'part' is of 'total'."""
-    if total == 0:
-        return 0.0
-    return (part / total) * 100
-
-
-# First agent in two-agent setup - data collector
-data_collector_agent = Agent(
-    "openai:gpt-4o-mini",
-    name="data_collector",
-    instructions="You collect and prepare data for analysis. Extract key numbers and organize information clearly.",
-    model_settings={
-        "temperature": 0.2,
-        "max_tokens": 400,
-    },
-)
-
-
-@data_collector_agent.tool_plain
-def extract_numbers(text: str) -> list[int]:
-    """Extract all numbers from a text string."""
-    import re
-    numbers = re.findall(r'\d+', text)
-    return [int(n) for n in numbers]
-
-
-@data_collector_agent.tool_plain
-def organize_data(items: list[str]) -> dict:
-    """Organize a list of items into categories."""
-    return {
-        "total_items": len(items),
-        "items": items,
-        "categories": list(set(item.split()[0] if item.split() else "unknown" for item in items))
-    }
-
-
-# Second agent in two-agent setup - data analyzer
-data_analyzer_agent = Agent(
-    "openai:gpt-4o-mini",
-    name="data_analyzer",
-    instructions="You analyze data provided by the data collector and provide insights and recommendations.",
-    output_type=AnalysisResult,
-    model_settings={
-        "temperature": 0.4,
-        "max_tokens": 500,
-    },
-)
-
-
-@data_analyzer_agent.tool_plain
-def calculate_statistics(numbers: list[int]) -> dict:
-    """Calculate basic statistics for a list of numbers."""
-    if not numbers:
-        return {"error": "No numbers provided"}
+def create_customer_support_agent(name: str, model: str) -> Agent:
+    """Create a customer support agent with single tool and structured context."""
+    agent = Agent(
+        model,
+        name=name,
+        instructions=(
+            "You are a customer support assistant. Use the customer's tier and account information "
+            "to provide personalized support. Use the tool to check if the customer is eligible for perks."
+        ),
+        output_type=CustomerSupportResponse,
+        model_settings={
+            "temperature": 0.3,
+            "max_tokens": 300,
+        },
+    )
     
-    return {
-        "count": len(numbers),
-        "sum": sum(numbers),
-        "average": sum(numbers) / len(numbers),
-        "min": min(numbers),
-        "max": max(numbers),
-    }
-
-
-@data_analyzer_agent.tool_plain
-def identify_trends(numbers: list[int]) -> str:
-    """Identify trends in a sequence of numbers."""
-    if len(numbers) < 2:
-        return "Not enough data to identify trends"
+    @agent.tool
+    def check_perk_eligibility(ctx, perk_name: str) -> dict:
+        """Check if customer is eligible for a specific perk based on their tier."""
+        customer: CustomerContext = ctx.deps
+        
+        perk_requirements = {
+            "priority_support": ["gold", "platinum"],
+            "free_shipping": ["silver", "gold", "platinum"],
+            "discount_20": ["platinum"],
+            "discount_10": ["gold", "platinum"],
+            "early_access": ["gold", "platinum"],
+        }
+        
+        eligible = customer.tier in perk_requirements.get(perk_name, [])
+        
+        return {
+            "perk_name": perk_name,
+            "eligible": eligible,
+            "customer_tier": customer.tier,
+            "reason": f"Customer tier '{customer.tier}' {'is' if eligible else 'is not'} eligible for '{perk_name}'"
+        }
     
-    differences = [numbers[i+1] - numbers[i] for i in range(len(numbers)-1)]
+    return agent
+
+
+def create_math_agent(name: str, model: str) -> Agent:
+    """Create a math agent with multiple calculation tools."""
+    agent = Agent(
+        model,
+        name=name,
+        instructions=(
+            "You are a mathematical assistant. Use the available tools to perform calculations "
+            "and return structured results. Always explain your work step by step."
+        ),
+        output_type=CalculationResult,
+        model_settings={
+            "temperature": 0.1,
+            "max_tokens": 400,
+        },
+    )
     
-    if all(d > 0 for d in differences):
-        return "Increasing trend"
-    elif all(d < 0 for d in differences):
-        return "Decreasing trend"
-    elif all(d == 0 for d in differences):
-        return "Constant values"
-    else:
-        return "Mixed trend"
+    @agent.tool_plain
+    def add(a: float, b: float) -> float:
+        """Add two numbers together."""
+        return a + b
+    
+    @agent.tool_plain
+    def subtract(a: float, b: float) -> float:
+        """Subtract b from a."""
+        return a - b
+    
+    @agent.tool_plain
+    def multiply(a: float, b: float) -> float:
+        """Multiply two numbers together."""
+        return a * b
+    
+    @agent.tool_plain
+    def divide(a: float, b: float) -> float:
+        """Divide a by b."""
+        if b == 0:
+            raise ValueError("Cannot divide by zero")
+        return a / b
+    
+    @agent.tool_plain
+    def calculate_percentage(part: float, total: float) -> float:
+        """Calculate what percentage 'part' is of 'total'."""
+        if total == 0:
+            return 0.0
+        return (part / total) * 100
+    
+    @agent.tool_plain
+    def power(base: float, exponent: float) -> float:
+        """Calculate base raised to the power of exponent."""
+        return base ** exponent
+    
+    return agent
 
 
-# Anthropic agents for provider testing
-anthropic_simple_agent = Agent(
-    "anthropic:claude-3-5-haiku-20241022",
-    name="anthropic_simple_agent",
-    instructions="You are a helpful assistant using Claude. Provide clear, concise answers.",
-    model_settings={
-        "temperature": 0.3,
-        "max_tokens": 200,
-    },
-)
-
-
-anthropic_math_agent = Agent(
-    "anthropic:claude-3-5-haiku-20241022",
-    name="anthropic_math_agent",
-    instructions="You are a mathematical assistant using Claude. Use the available tools to perform calculations and return structured results.",
-    output_type=CalculationResult,
-    model_settings={
-        "temperature": 0.1,
-        "max_tokens": 300,
-    },
-)
-
-
-@anthropic_math_agent.tool_plain
-def anthropic_add(a: int, b: int) -> int:
-    """Add two numbers together (Anthropic version)."""
-    return a + b
-
-
-@anthropic_math_agent.tool_plain
-def anthropic_multiply(a: int, b: int) -> int:
-    """Multiply two numbers together (Anthropic version)."""
-    return a * b
-
-
-@anthropic_math_agent.tool_plain
-def anthropic_calculate_percentage(part: float, total: float) -> float:
-    """Calculate what percentage 'part' is of 'total' (Anthropic version)."""
-    if total == 0:
-        return 0.0
-    return (part / total) * 100
+def create_mcp_agent(name: str, model: str) -> Agent:
+    """Create an agent that connects to an MCP server via stdio."""
+    # Connect to the MCP server
+    mcp_server = MCPServerStdio("python", args=["mcp_server.py"])
+    
+    # Create agent with MCP server as a toolset
+    agent = Agent(
+        model,
+        name=name,
+        instructions=(
+            "You are a helpful assistant that can perform calculations and text analysis "
+            "using MCP tools. Use the available tools to answer user questions."
+        ),
+        output_type=MCPCalculationResult,
+        toolsets=[mcp_server],
+        model_settings={
+            "temperature": 0.2,
+            "max_tokens": 400,
+        },
+    )
+    
+    return agent
