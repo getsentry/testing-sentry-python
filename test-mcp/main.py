@@ -209,13 +209,3 @@ def debug_assistant_prompt() -> str:
 4. Provide prevention strategies
 
 Ask clarifying questions if needed."""
-
-
-
-# mcp.run()
-# def main():
-#     # Run the MCP server
-#     mcp.run()
-
-# if __name__ == "__main__":
-#     main()

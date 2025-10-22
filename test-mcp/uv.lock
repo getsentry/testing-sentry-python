@@ -1175,7 +1175,7 @@ wheels = [
 
 [[package]]
 name = "sentry-sdk"
-version = "2.41.0"
+version = "2.42.1"
 source = { editable = "../../sentry-python" }
 dependencies = [
     { name = "certifi" },
@@ -1216,6 +1216,7 @@ requires-dist = [
     { name = "litestar", marker = "extra == 'litestar'", specifier = ">=2.0.0" },
     { name = "loguru", marker = "extra == 'loguru'", specifier = ">=0.5" },
     { name = "markupsafe", marker = "extra == 'flask'" },
+    { name = "mcp", marker = "extra == 'mcp'", specifier = ">=1.15.0" },
     { name = "openai", marker = "extra == 'openai'", specifier = ">=1.0.0" },
     { name = "openfeature-sdk", marker = "extra == 'openfeature'", specifier = ">=0.7.1" },
     { name = "opentelemetry-distro", marker = "extra == 'opentelemetry'", specifier = ">=0.35b0" },
@@ -1236,7 +1237,7 @@ requires-dist = [
     { name = "unleashclient", marker = "extra == 'unleash'", specifier = ">=6.0.1" },
     { name = "urllib3", specifier = ">=1.26.11" },
 ]
-provides-extras = ["aiohttp", "anthropic", "arq", "asyncpg", "beam", "bottle", "celery", "celery-redbeat", "chalice", "clickhouse-driver", "django", "falcon", "fastapi", "flask", "grpcio", "http2", "httpx", "huey", "huggingface-hub", "langchain", "langgraph", "launchdarkly", "litellm", "litestar", "loguru", "openai", "openfeature", "opentelemetry", "opentelemetry-experimental", "pure-eval", "pymongo", "pyspark", "quart", "rq", "sanic", "sqlalchemy", "starlette", "starlite", "statsig", "tornado", "unleash", "google-genai"]
+provides-extras = ["aiohttp", "anthropic", "arq", "asyncpg", "beam", "bottle", "celery", "celery-redbeat", "chalice", "clickhouse-driver", "django", "falcon", "fastapi", "flask", "grpcio", "http2", "httpx", "huey", "huggingface-hub", "langchain", "langgraph", "launchdarkly", "litellm", "litestar", "loguru", "mcp", "openai", "openfeature", "opentelemetry", "opentelemetry-experimental", "pure-eval", "pymongo", "pyspark", "quart", "rq", "sanic", "sqlalchemy", "starlette", "starlite", "statsig", "tornado", "unleash", "google-genai"]
 
 [[package]]
 name = "shellingham"

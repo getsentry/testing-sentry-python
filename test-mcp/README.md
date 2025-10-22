@@ -71,31 +71,38 @@ uv sync
 
 ### FastMCP Library Server (HTTP)
 ```bash
-# Using the script
+# Using the script (automatically starts MCP inspector)
 ./run_fastmcp.sh
 
-# Or directly
+# Or directly (just the server, no inspector)
 uv run python main_fastmcp.py
 ```
 
-This starts an HTTP server on `http://127.0.0.1:8000` that you can interact with via HTTP requests.
+This starts an HTTP server on `http://127.0.0.1:8000` that you can interact with via HTTP requests. The `run_fastmcp.sh` script automatically starts the MCP inspector tool for testing.
 
 ### MCP Built-in FastMCP Server (STDIO)
 ```bash
-# Using the script
+# Using the script (automatically starts MCP inspector)
 ./run.sh
 
-# Or directly
+# Or directly (just the server, no inspector)
 uv run python main.py
 ```
 
+The `run.sh` script automatically starts the MCP inspector tool for testing.
+
 ### Low-Level Server (STDIO)
 ```bash
-# Using the script
+# Using the script (server only)
 ./run_lowlevel.sh
 
 # Or directly
 uv run python main_lowlevel.py
+```
+
+**Note:** The `run_lowlevel.sh` script does NOT automatically start the MCP inspector. To test this server, you need to manually start the inspector:
+```bash
+npx @modelcontextprotocol/inspector
 ```
 
 ## Using with MCP Clients
@@ -144,15 +151,27 @@ The FastMCP Library server runs as an HTTP server and requires a different clien
 
 The [MCP Inspector](https://github.com/modelcontextprotocol/inspector) is a developer tool for testing and debugging MCP servers. It provides an interactive web interface to test your server's tools, resources, and prompts.
 
-### Installation & Usage
+### Automatic Inspector Startup
 
-The MCP Inspector can be run directly using `npx` without installation:
+The following run scripts **automatically start the MCP inspector** for you:
+- `./run.sh` (MCP Built-in FastMCP server)
+- `./run_fastmcp.sh` (FastMCP Library server)
+
+### Manual Inspector Startup
+
+For the **low-level server** (`run_lowlevel.sh`), the inspector is NOT started automatically. You need to manually start it:
 
 ```bash
+# First, start the server
+./run_lowlevel.sh
+
+# Then, in a separate terminal, start the inspector
 npx @modelcontextprotocol/inspector
 ```
 
-### Testing Each Server Implementation
+### Testing Each Server Implementation Manually
+
+If you prefer to run the inspector manually for any server:
 
 **MCP Built-in FastMCP Server (`main.py`):**
 ```bash
