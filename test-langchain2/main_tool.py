@@ -3,7 +3,7 @@ import os
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools import tool
-from langchain.agents import create_tool_calling_agent, AgentExecutor
+from langchain.agents import create_agent
 from langchain_core.prompts import ChatPromptTemplate
 
 import sentry_sdk
@@ -27,35 +27,36 @@ def calculate_tip(bill_amount: float, tip_percentage: float) -> float:
 def my_pipeline(llm, tools):
     with sentry_sdk.start_transaction(name="langchain-sync-tool"):
         # Create agent with tools
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are a helpful assistant that can use tools to help answer questions."),
-            ("placeholder", "{chat_history}"),
-            ("human", "{input}"),
-            ("placeholder", "{agent_scratchpad}"),
-        ])
-
-        agent = create_tool_calling_agent(llm, tools, prompt)
-        agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+        agent = create_agent(
+            model=llm,
+            tools=tools,
+            system_prompt="You are a helpful assistant that can use tools to help answer questions",
+        ).with_config(config={"run_name": "MyAgent1"})
 
         # Test with weather tool
-        result1 = agent_executor.invoke({
-            "input": "What's the weather like in San Francisco, CA?"
-        })
+        result1 = agent.invoke(
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "What's the weather like in San Francisco, CA?",
+                    }
+                ]
+            }
+        )
         print("Weather Result:")
         print(result1)
 
         # Test with calculation tool
-        result2 = agent_executor.invoke({
-            "input": "Calculate a 18% tip on a $45.50 bill"
-        })
+        result2 = agent.invoke({"input": "Calculate a 18% tip on a $45.50 bill"})
         print("Tip Calculation Result:")
         print(result2)
 
         # Test streaming with agent
         print("Streaming Result:")
-        for chunk in agent_executor.stream({
-            "input": "What's the weather in New York and calculate a 20% tip on $30?"
-        }):
+        for chunk in agent.stream(
+            {"input": "What's the weather in New York and calculate a 20% tip on $30?"}
+        ):
             print(chunk)
 
 
