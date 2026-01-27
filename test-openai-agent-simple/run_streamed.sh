@@ -11,4 +11,4 @@ if ! command -v uv &> /dev/null; then
 fi
 
 # Run the script
-uv run python main.py
+uv run python main_streamed.py
