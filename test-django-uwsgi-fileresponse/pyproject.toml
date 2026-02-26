@@ -1,0 +1,19 @@
+[project]
+name = "test-django-uwsgi-fileresponse"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "django>=6.0.2",
+    "sentry-sdk>=2.53.0",
+    "uwsgi>=2.0.31",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }
+
+[dependency-groups]
+dev = [
+    "remote-pdb>=2.1.0",
+]
