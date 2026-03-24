@@ -1,0 +1,14 @@
+[project]
+name = "test-fastapi-with-database"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "fastapi>=0.115.11",
+    "asyncpg>=0.30.0",
+    "sentry-sdk[fastapi,asyncpg]",
+    "uvicorn>=0.34.0",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "/sentry-python", editable = true }
