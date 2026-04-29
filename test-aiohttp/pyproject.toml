@@ -1,0 +1,13 @@
+[project]
+name = "test-aiohttp"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "aiohttp>=3.9",
+    "ipdb>=0.13.13",
+    "sentry-sdk[aiohttp]",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }
