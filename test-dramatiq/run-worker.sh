@@ -1,20 +1,14 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 reset
 
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
 
-# Install requirements into virtual environment
-pip install -r requirements.txt
-
-# Start a fresh redis server
 pkill redis-server || true
 sleep 1
 rm -rf dump.rdb
 redis-server --daemonize yes
 
-# Start dramatiq worker
-dramatiq --processes 1 main
+uv run dramatiq --processes 1 main
