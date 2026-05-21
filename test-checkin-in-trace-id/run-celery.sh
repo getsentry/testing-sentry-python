@@ -1,9 +1,10 @@
-python -m venv .venv
+#!/usr/bin/env bash
+set -euo pipefail
 
-source .venv/bin/activate
-
-pip install -r requirements.txt
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
 
 redis-server &
 
-celery -A tasks worker --loglevel=DEBUG
+uv run celery -A tasks worker --loglevel=DEBUG
