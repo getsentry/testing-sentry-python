@@ -1,9 +1,0 @@
-fastapi
-uvicorn
-
-aiohttp 
-
-ipdb
-honcho
-
--e  ../../../code/sentry-python

@@ -1,0 +1,16 @@
+[project]
+name = "test-tracing-twp-dsc"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "aiohttp>=3.11.14",
+    "fastapi>=0.115.11",
+    "honcho>=2.0.0",
+    "ipdb>=0.13.13",
+    "uvicorn>=0.34.0",
+    "sentry-sdk[fastapi]",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }
