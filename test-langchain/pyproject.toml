@@ -1,0 +1,16 @@
+[project]
+name = "test-langchain"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "ipdb>=0.13.13",
+    "langchain>=0.3.18",
+    "langchain-anthropic>=0.3.12",
+    "langchain-community>=0.3.17",
+    "langchain-openai>=0.3.7",
+    "sentry-sdk",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }

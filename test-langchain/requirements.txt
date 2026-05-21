@@ -1,8 +1,0 @@
-langchain
-langchain-openai
-langchain-anthropic
-langchain-community
-
--e  ../../../code/sentry-python
-
-ipdb
