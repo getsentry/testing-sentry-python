@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
-python -m venv .venv
-source .venv/bin/activate
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
 
-pip install -r requirements.txt
-
-# see Procfile for the commands that are run
-honcho start
+uv run honcho start
