@@ -1,5 +1,0 @@
--e ../../../code/sentry-python 
-
-clickhouse-driver
-
-ipdb
