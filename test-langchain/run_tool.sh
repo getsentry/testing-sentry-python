@@ -1,17 +1,9 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
-
 reset
 
-# Set up environment variables for API keys
-# export OPENAI_API_KEY="your-openai-key-here"
-# export ANTHROPIC_API_KEY="your-anthropic-key-here"
-# export SENTRY_DSN="your-sentry-dsn-here"
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
 
-python3 -m venv .venv
-source .venv/bin/activate
-
-pip install -r requirements.txt
-
-python3 main_tool.py
+uv run python3 main_tool.py
