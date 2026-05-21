@@ -1,0 +1,13 @@
+[project]
+name = "test-long-running-transaction"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "ipdb>=0.13.13",
+    "sentry-sdk",
+    "Werkzeug<2.1.0",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }
