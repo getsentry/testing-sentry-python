@@ -1,5 +1,0 @@
-sanic
-
-ipdb
-
--e ../../../code/sentry-python 
