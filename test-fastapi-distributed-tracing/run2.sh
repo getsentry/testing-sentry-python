@@ -1,15 +1,9 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
-
 reset
 
-python -m venv .venv
-source .venv/bin/activate
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
 
-pip install -r requirements.txt
-
-# uvicorn main:app --port 5000 --reload --root-path /api/v1 &
-uvicorn main2:app --port 5002 --reload 
-
-#nginx -c "$(pwd)/nginx.conf" 
+uv run uvicorn main2:app --port 5002 --reload
