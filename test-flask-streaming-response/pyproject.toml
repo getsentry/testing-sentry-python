@@ -1,0 +1,16 @@
+[project]
+name = "test-flask-streaming-response"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "blinker>=1.9.0",
+    "flask>=3.1.1",
+    "gunicorn>=23.0.0",
+    "ipdb>=0.13.13",
+    "markupsafe>=3.0.2",
+    "sentry-sdk[flask]",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }
