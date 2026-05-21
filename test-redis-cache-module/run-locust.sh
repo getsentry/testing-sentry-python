@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-# exit on first error
-set -xe
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
 
-# create and activate virtual environment
-python -m venv .venv
-source .venv/bin/activate
-
-locust
+uv run locust
