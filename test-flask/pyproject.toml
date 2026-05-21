@@ -1,0 +1,17 @@
+[project]
+name = "test-flask"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "blinker>=1.9.0",
+    "click>=8.1.8",
+    "flask>=3.1.1",
+    "ipdb>=0.13.13",
+    "markupsafe>=3.0.2",
+    "sentry-sdk[flask]",
+    "sqlalchemy>=2.0.38",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }
