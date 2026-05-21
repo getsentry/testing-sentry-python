@@ -1,5 +1,0 @@
-ipdb
-
-# Sentry
--e ../../../code/sentry-python/  # local dev version of sentry python sdk.
-# sentry-sdk==1.11.0  # production version of sentry python sdk from PyPI.
