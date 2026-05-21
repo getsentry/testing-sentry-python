@@ -53,11 +53,12 @@ echo "Creating temporary directory: $TEMP_DIR"
 echo "Copying function code..."
 cp -r lambda_function/* $TEMP_DIR/
 
-# Create virtual environment and install dependencies
+# Install dependencies
 echo "Setting up Python environment..."
-python -m venv $TEMP_DIR/.venv
-source $TEMP_DIR/.venv/bin/activate
-pip install -r $TEMP_DIR/requirements.txt -t $TEMP_DIR/
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
+uv pip install --system --no-cache -r $TEMP_DIR/pyproject.toml --target $TEMP_DIR/
 
 # Create deployment package
 echo "Creating deployment package..."
