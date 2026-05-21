@@ -1,0 +1,14 @@
+[project]
+name = "test-checkin-in-trace-id"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "celery[redis]>=5.4.0",
+    "ipdb>=0.13.13",
+    "requests>=2.32.3",
+    "sentry-sdk[celery]",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }

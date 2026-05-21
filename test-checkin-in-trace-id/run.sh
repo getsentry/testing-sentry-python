@@ -1,8 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
 
-python -m venv .venv
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
 
-source .venv/bin/activate
-
-pip install -r requirements.txt
-
-python main.py
+uv run python main.py
