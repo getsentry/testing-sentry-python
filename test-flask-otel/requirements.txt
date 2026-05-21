@@ -1,9 +1,0 @@
-flask
-blinker
-markupsafe
-
-opentelemetry-distro
-
--e  ../../code/sentry-python
-
-ipdb
