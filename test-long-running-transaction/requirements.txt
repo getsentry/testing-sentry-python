@@ -1,6 +1,0 @@
-
--e  ../../../code/sentry-python
-
-Werkzeug<2.1.0
-
-ipdb
