@@ -1,18 +1,8 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-# exit on first error
-set -xe
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
 
-# create and activate virtual environment
-python -m venv .venv
-source .venv/bin/activate
-
-# Install (or update) requirements
-python -m pip install -r requirements.txt
-
-
-# Run Flask application on localhost:5000
-flask --app main run
-
-# Run Flask application with multithreading (port 8000)
-# gunicorn main:app -w 1 --threads 12
+uv run flask --app main run
