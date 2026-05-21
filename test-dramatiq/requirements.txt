@@ -1,9 +1,0 @@
-dramatiq
-
-redis
-
-ipdb
-
-# Sentry
--e ../../../code/sentry-python  # local dev version of sentry python sdk.
-# sentry-sdk==2.8.0  # production version of sentry python sdk from PyPI.
