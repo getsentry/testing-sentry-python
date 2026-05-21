@@ -1,6 +1,0 @@
--e ../../../code/sentry-python 
-
-grpcio
-grpcio-tools  # includes `protoc` compiler
-
-ipdb
