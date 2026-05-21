@@ -11,4 +11,4 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-sentry-sdk = { path = "/sentry-python", editable = true }
+sentry-sdk = { path = "../../sentry-python", editable = true }
