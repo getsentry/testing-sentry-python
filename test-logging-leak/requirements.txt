@@ -1,5 +1,0 @@
-aiohttp
-
-ipdb
-
--e ../../../code/sentry-python 
