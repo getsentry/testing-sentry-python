@@ -1,0 +1,14 @@
+[project]
+name = "test-fastapi-background-tasks"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "fastapi>=0.115.11",
+    "ipdb>=0.13.13",
+    "sentry-sdk[fastapi]",
+    "uvicorn>=0.34.0",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }
