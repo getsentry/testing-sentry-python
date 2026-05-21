@@ -1,8 +1,0 @@
-Django==4.1a1
-psycopg  # connection to Postgres database
-ipdb
-django-debug-toolbar
-
-channels[daphne]
-
--e ../../../code/sentry-python  # sdk in a sibling folder to this projects folder

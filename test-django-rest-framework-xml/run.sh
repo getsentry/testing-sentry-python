@@ -1,20 +1,10 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-# exit on first error
-set -xe
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
 
-# create and activate virtual environment
-python -m venv .venv
-source .venv/bin/activate
-
-# Install (or update) requirements
-python -m pip install -r requirements.txt
-
-# run migrations
-# ./manage.py migrate
-
-# Run Django application on localhost:8000
 cd mysite
-daphne -b 0.0.0.0 -p 8000 mysite.asgi:application
-# ./manage.py runserver 0.0.0.0:8000
-#gunicorn movie_search.project.asgi:application -k uvicorn.workers.UvicornWorker
+
+uv run daphne -b 0.0.0.0 -p 8000 mysite.asgi:application
