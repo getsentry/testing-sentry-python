@@ -1,0 +1,13 @@
+[project]
+name = "test-ray"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "ipdb>=0.13.13",
+    "ray>=2.46.0",
+    "sentry-sdk",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }
