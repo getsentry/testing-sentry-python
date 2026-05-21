@@ -1,0 +1,16 @@
+[project]
+name = "test-gunicorn-gevent-otel"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "gevent>=24.11.1",
+    "gunicorn>=23.0.0",
+    "ipdb>=0.13.13",
+    "opentelemetry-distro>=0.52b0",
+    "opentelemetry-exporter-otlp-proto-http>=1.31.0",
+    "sentry-sdk",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }

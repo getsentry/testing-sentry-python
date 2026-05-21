@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
-
 reset
 
-python -m venv .venv
-source .venv/bin/activate
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
 
-pip install -r requirements.txt
-
-
-gunicorn -c gunicorn.conf.py
+uv run gunicorn -c gunicorn.conf.py
