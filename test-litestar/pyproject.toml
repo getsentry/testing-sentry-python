@@ -1,0 +1,14 @@
+[project]
+name = "test-litestar"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "ipdb>=0.13.13",
+    "litestar[brotli,cryptography]>=2.15.0",
+    "sentry-sdk[litestar]",
+    "uvicorn>=0.34.0",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }
