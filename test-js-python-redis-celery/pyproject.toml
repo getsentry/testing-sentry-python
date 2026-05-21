@@ -1,0 +1,16 @@
+[project]
+name = "test-js-python-redis-celery"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "celery>=5.4.0",
+    "fastapi>=0.115.11",
+    "ipdb>=0.13.13",
+    "redis>=5.2.1",
+    "sentry-sdk[fastapi,celery]",
+    "uvicorn>=0.34.0",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }
