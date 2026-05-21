@@ -1,8 +1,0 @@
-Django
-psycopg  # connection to Postgres database
-django-debug-toolbar
-ipdb
-strawberry-graphql
-strawberry-graphql-django
-
--e ../../../code/sentry-python  # sdk in a sibling folder to this projects folder
