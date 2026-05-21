@@ -1,0 +1,16 @@
+[project]
+name = "test-fastapi-root-path"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "black>=25.1.0",
+    "fastapi>=0.115.11",
+    "ipdb>=0.13.13",
+    "requests>=2.32.3",
+    "sentry-sdk[fastapi]",
+    "uvicorn>=0.34.0",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }
