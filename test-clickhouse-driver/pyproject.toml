@@ -1,0 +1,13 @@
+[project]
+name = "test-clickhouse-driver"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "clickhouse-driver>=0.2.9",
+    "ipdb>=0.13.13",
+    "sentry-sdk",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }
