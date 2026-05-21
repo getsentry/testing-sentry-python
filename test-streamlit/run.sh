@@ -1,14 +1,8 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-# exit on first error
-set -xe
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
 
-# create and activate virtual environment
-python -m venv .venv
-source .venv/bin/activate
-
-# Install (or update) requirements
-python -m pip install -r requirements.txt
-
-
-streamlit run main.py
+uv run streamlit run main.py
