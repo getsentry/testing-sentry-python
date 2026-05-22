@@ -1,0 +1,15 @@
+[project]
+name = "test-celery-beat-parent-span-id"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "celery>=5.4.0",
+    "flask>=3.1.0",
+    "ipdb>=0.13.13",
+    "redis>=5.2.1",
+    "sentry-sdk[celery,flask]",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }
