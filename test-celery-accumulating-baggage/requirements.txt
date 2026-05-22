@@ -1,6 +1,0 @@
-celery
-redis
-
--e ../../../code/sentry-python 
-
-ipdb
