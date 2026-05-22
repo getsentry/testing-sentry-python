@@ -1,5 +1,0 @@
-asyncpg
-
--e ../../../code/sentry-python 
-
-ipdb
