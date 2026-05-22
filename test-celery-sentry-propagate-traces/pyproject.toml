@@ -1,0 +1,14 @@
+[project]
+name = "test-celery-sentry-propagate-traces"
+version = "0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "celery>=5.4.0",
+    "ipdb>=0.13.13",
+    "redis>=5.2.1",
+    "sentry-sdk[celery]",
+]
+
+[tool.uv.sources]
+sentry-sdk = { path = "../../sentry-python", editable = true }
