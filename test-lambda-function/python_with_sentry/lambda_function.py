@@ -11,7 +11,8 @@ sentry_sdk.init(
             timeout_warning=True,
         ),
     ],
-    traces_sample_rate=1.0,    
+    traces_sample_rate=1.0,
+    trace_lifecycle="stream",
     debug=True,
 )
 
