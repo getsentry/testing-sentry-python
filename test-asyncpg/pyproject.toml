@@ -6,7 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
     "asyncpg>=0.30.0",
     "ipdb>=0.13.13",
-    "sentry-sdk[asyncpg]",
+    "sentry-sdk[asyncpg]>=2.68.1",
 ]
 
 [tool.uv.sources]
