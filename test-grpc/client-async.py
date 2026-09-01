@@ -6,6 +6,7 @@ import helloworld_pb2
 import helloworld_pb2_grpc
 
 import sentry_sdk
+import sentry_sdk.traces
 from sentry_sdk.integrations.grpc import GRPCIntegration
 # from sentry_sdk.integrations.grpc.client import ClientInterceptor
 from sentry_sdk.integrations.grpc.aio.client import ClientInterceptor
@@ -28,7 +29,7 @@ async def main():
 
     sentry_sdk.init(**sentry_settings)
 
-    with sentry_sdk.start_transaction(op="function", name="grcp_client"):
+    with sentry_sdk.traces.start_span(name="grcp_client", attributes={"sentry.op": "function"}):
         print("Will try to greet world ...")
 
         async with grpc.aio.insecure_channel(f"localhost:{SERVER_PORT}") as channel:
