@@ -6,6 +6,7 @@ from arq import create_pool
 from arq.connections import RedisSettings
 
 import sentry_sdk
+import sentry_sdk.traces
 from sentry_sdk.integrations.arq import ArqIntegration
 
 
@@ -25,7 +26,7 @@ async def main():
 
     redis = await create_pool(RedisSettings())
 
-    with sentry_sdk.start_transaction(name="testing_sentry"):
+    with sentry_sdk.traces.start_span(name="testing_sentry"):
         r = await redis.enqueue_job("add_numbers", 1, 2)
 
 asyncio.run(main())
