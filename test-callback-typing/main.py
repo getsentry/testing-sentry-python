@@ -1,9 +1,8 @@
 import asyncio
 import os
-from typing import Any
 
 import sentry_sdk
-from sentry_sdk.types import Event, Hint, SamplingContext, Breadcrumb, BreadcrumbHint, MonitorConfig
+from sentry_sdk.types import Event, Hint, SamplingContext, Breadcrumb, BreadcrumbHint, MonitorConfig, SpanJSON
 from sentry_sdk.crons import MonitorStatus, capture_checkin
 
 
@@ -23,11 +22,7 @@ def my_before_send(event: Event, hint: Hint) -> Event | None:
     return event
 
 
-# NOTE: sentry_sdk.types has no public span type to annotate this callback with.
-# `SpanJSON` exists only in the private `sentry_sdk._types` module, which is not
-# re-exported publicly, so `dict[str, Any]` is the best available annotation here.
-# Spans cannot be dropped by this callback, so the return type is not Optional.
-def my_before_send_span(span: dict[str, Any], hint: Hint) -> dict[str, Any]:
+def my_before_send_span(span: SpanJSON, hint: Hint) -> SpanJSON:
     return span
 
 
