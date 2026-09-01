@@ -5,6 +5,7 @@ import datetime
 import os
 
 import sentry_sdk
+import sentry_sdk.traces
 from sentry_sdk.integrations.asyncpg import AsyncPGIntegration
 
 DATABASE_USER = "demo_app_django_react"
@@ -33,7 +34,9 @@ async def main():
 
     sentry_sdk.init(**sentry_settings)
 
-    with sentry_sdk.start_transaction(op="function", name="asyncpg"):
+    with sentry_sdk.traces.start_span(
+        name="asyncpg", attributes={"sentry.op": "function"}
+    ):
         # Establish a connection to an existing database
         conn = await asyncpg.connect(DATABASE_URL)
 
