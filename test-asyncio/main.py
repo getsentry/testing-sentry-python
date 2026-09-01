@@ -7,26 +7,26 @@ import sentry_sdk.traces
 from sentry_sdk.integrations.asyncio import AsyncioIntegration
 
 
+# The dynamic sampling context is deliberately not recorded. Sampling is
+# configured through traces_sample_rate / traces_sampler, and copying DSC
+# internals onto a span as attributes would misrepresent them as span data.
+TRACE_CONTEXT_SKIP_KEYS = {"dynamic_sampling_context"}
+
+
 def flatten_trace_context(prefix, context):
     """Flatten a trace context dict into scalar span attributes.
 
     Streamed spans have no concept of context, so values that used to be set
-    via `set_context()` become attributes. Two wrinkles force the flattening:
-    `get_trace_context()` nests a `dynamic_sampling_context` dict, and
-    `set_attribute()` coerces a dict with `repr()` rather than rejecting it,
-    which would yield an unparseable blob. Prefixing also keeps the current
-    and isolation scopes from overwriting each other's identically named keys.
+    via `set_context()` become attributes instead. Keys are prefixed so the
+    current and isolation scopes do not overwrite each other's identically
+    named entries. `None` values are skipped -- they would otherwise serialize
+    as the string "None".
     """
-    flat = {}
-    for key, value in (context or {}).items():
-        if value is None:
-            # Would otherwise serialize as the string "None".
-            continue
-        if isinstance(value, dict):
-            flat.update(flatten_trace_context(f"{prefix}.{key}", value))
-        else:
-            flat[f"{prefix}.{key}"] = value
-    return flat
+    return {
+        f"{prefix}.{key}": value
+        for key, value in (context or {}).items()
+        if value is not None and key not in TRACE_CONTEXT_SKIP_KEYS
+    }
 
 
 def set_scope_trace_contexts(span):
