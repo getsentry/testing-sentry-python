@@ -7,6 +7,7 @@ from celery import Celery, signals
 from celery.schedules import crontab
 
 import sentry_sdk
+import sentry_sdk.traces
 from sentry_sdk.integrations.celery import CeleryIntegration
 
 
@@ -56,8 +57,8 @@ def task_a(self, msg):
     print("[task-a] That's my message to the world: %s" % msg)
 
     # simulate some spans that are created during the task is processing
-    with sentry_sdk.start_span(op="function", name="parent-span"):
-        with sentry_sdk.start_span(op="function", name="child-span"):
+    with sentry_sdk.traces.start_span(name="parent-span", attributes={"sentry.op": "function"}):
+        with sentry_sdk.traces.start_span(name="child-span", attributes={"sentry.op": "function"}):
             # simulate some errors during the task is processing
             for i in range(5):
                 try:
