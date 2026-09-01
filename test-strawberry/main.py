@@ -12,12 +12,12 @@ sentry_sdk.init(
     dsn=os.environ.get("SENTRY_DSN"),
     environment=os.environ.get("ENV", "test"),
     traces_sample_rate=1.0,
+    trace_lifecycle="stream",
     profiles_sample_rate=1.0,
     debug=True,
     integrations=[
         StrawberryIntegration(async_execution=True),
     ],
-    _experiments={"trace_lifecycle": "stream"},
 )
 
 
