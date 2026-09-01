@@ -2,6 +2,7 @@ import asyncio
 import os
 
 import sentry_sdk
+import sentry_sdk.traces
 from sentry_sdk.types import Event, Hint, SamplingContext, Breadcrumb, BreadcrumbHint, MonitorConfig, SpanJSON
 from sentry_sdk.crons import MonitorStatus, capture_checkin
 
@@ -54,7 +55,7 @@ async def main() -> None:
     capture_checkin()
 
 
-    with sentry_sdk.start_span(name="test-span"):
+    with sentry_sdk.traces.start_span(name="test-span"):
         try:
             1 / 0
         except Exception:
