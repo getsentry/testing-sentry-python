@@ -5,7 +5,7 @@ requires-python = ">=3.12"
 
 dependencies = [
     "ipdb>=0.13.13",
-    "sentry-sdk",
+    "sentry-sdk>=2.68.1",
 ]
 
 [tool.uv.sources]
