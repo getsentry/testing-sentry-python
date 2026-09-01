@@ -3,6 +3,7 @@ import os
 from anthropic import Anthropic
 
 import sentry_sdk
+import sentry_sdk.traces
 from sentry_sdk.consts import SPANTEMPLATE
 from sentry_sdk.integrations.anthropic import AnthropicIntegration
 
@@ -109,7 +110,7 @@ def main():
         api_key=os.environ.get("ANTHROPIC_API_KEY"),
     )
 
-    with sentry_sdk.start_transaction(name="anthropic-sync-tool"):
+    with sentry_sdk.traces.start_span(name="anthropic-sync-tool", attributes={"sentry.op": "anthropic-sync-tool"}):
         my_custom_agent(client)
 
 
