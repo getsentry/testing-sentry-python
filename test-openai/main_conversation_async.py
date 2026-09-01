@@ -5,6 +5,7 @@ import uuid
 from openai import AsyncOpenAI
 
 import sentry_sdk
+import sentry_sdk.traces
 from sentry_sdk.ai.monitoring import ai_track
 from sentry_sdk.ai.utils import set_conversation_id
 from sentry_sdk.integrations.asyncio import AsyncioIntegration
@@ -95,7 +96,7 @@ async def concurrent_conversations_workflow(client):
     print(f"Conversation A ID: {conversation_id_a}")
     print(f"Conversation B ID: {conversation_id_b}")
 
-    with sentry_sdk.start_transaction(name="openai-concurrent-conversations"):
+    with sentry_sdk.traces.start_span(name="openai-concurrent-conversations"):
         # Run both conversations concurrently
         results = await asyncio.gather(
             conversation_a(client, conversation_id_a),

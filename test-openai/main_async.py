@@ -4,6 +4,7 @@ import os
 from openai import AsyncOpenAI
 
 import sentry_sdk
+import sentry_sdk.traces
 from sentry_sdk.ai.monitoring import ai_track
 from sentry_sdk.integrations.openai import OpenAIIntegration
 from sentry_sdk.integrations.stdlib import StdlibIntegration
@@ -36,7 +37,7 @@ tools = [{
 
 @ai_track("My async OpenAI workflow")
 async def my_workflow(client):
-    with sentry_sdk.start_transaction(name="openai-async"):
+    with sentry_sdk.traces.start_span(name="openai-async"):
         # Responses API with tools
         response = await client.responses.create(
             model="gpt-4o-mini",
