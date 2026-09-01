@@ -13,6 +13,7 @@ sentry_settings = {
     "environment": os.getenv("ENV", "local.main"),
     "release": "0.0.0",        
     "traces_sample_rate": 1.0,
+    "trace_lifecycle": "stream",
     "send_default_pii": True,
     "debug": True,
     "integrations": [CeleryIntegration(
