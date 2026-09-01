@@ -1,5 +1,6 @@
 import asyncio
 import os
+from typing import Any
 
 import sentry_sdk
 from sentry_sdk.types import Event, Hint, SamplingContext, Breadcrumb, BreadcrumbHint, MonitorConfig
@@ -22,8 +23,12 @@ def my_before_send(event: Event, hint: Hint) -> Event | None:
     return event
 
 
-def my_before_send_transaction(event: Event, hint: Hint) -> Event | None:
-    return event
+# NOTE: sentry_sdk.types has no public span type to annotate this callback with.
+# `SpanJSON` exists only in the private `sentry_sdk._types` module, which is not
+# re-exported publicly, so `dict[str, Any]` is the best available annotation here.
+# Spans cannot be dropped by this callback, so the return type is not Optional.
+def my_before_send_span(span: dict[str, Any], hint: Hint) -> dict[str, Any]:
+    return span
 
 
 def my_before_breadcrumb(crumb: Breadcrumb, hint: BreadcrumbHint) -> Breadcrumb | None:
@@ -37,6 +42,7 @@ async def main() -> None:
         dsn=os.getenv("SENTRY_DSN", None),
         environment=os.getenv("ENV", "local"),
         traces_sample_rate=1.0,
+        trace_lifecycle="stream",
         profiles_sample_rate=1.0,
         send_default_pii=True,
         debug=True,
@@ -44,7 +50,7 @@ async def main() -> None:
         traces_sampler=my_traces_sampler,
         profiles_sampler=my_profiles_sampler,
         before_send=my_before_send,
-        before_send_transaction=my_before_send_transaction,
+        before_send_span=my_before_send_span,
         before_breadcrumb=my_before_breadcrumb,
     )
 
