@@ -7,7 +7,7 @@ dependencies = [
     "fastapi>=0.115.11",
     "ipdb>=0.13.13",
     "requests>=2.32.3",
-    "sentry-sdk[fastapi,asyncpg,rq]",
+    "sentry-sdk[fastapi,asyncpg,rq]>=2.68.1",
     "uvicorn>=0.34.0",
 ]
 
