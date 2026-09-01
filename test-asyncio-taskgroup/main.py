@@ -30,6 +30,7 @@ sentry_sdk.init(
     dsn=os.getenv("SENTRY_DSN", None),
     environment=os.getenv("ENV", "local"),
     traces_sample_rate=1.0,
+    trace_lifecycle="stream",
     debug=True,
     instrumenter="otel",
     before_send=before_send,

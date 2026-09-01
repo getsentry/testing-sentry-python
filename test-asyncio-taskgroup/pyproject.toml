@@ -11,7 +11,7 @@ dependencies = [
     "opentelemetry-instrumentation-fastapi>=0.50b0",
     "starlette==0.36.3",
     "uvicorn>=0.34.0",
-    "sentry-sdk[fastapi]",
+    "sentry-sdk[fastapi]>=2.68.1",
 ]
 
 [tool.uv.sources]
