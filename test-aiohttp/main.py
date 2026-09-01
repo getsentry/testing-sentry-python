@@ -8,8 +8,8 @@ from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 sentry_sdk.init(
     dsn=os.environ.get("SENTRY_DSN"),
     environment=os.environ.get("ENV", "test"),
-    _experiments={"trace_lifecycle": "stream"},
     traces_sample_rate=1.0,
+    trace_lifecycle="stream",
     profiles_sample_rate=1.0,
     debug=True,
     integrations=[
