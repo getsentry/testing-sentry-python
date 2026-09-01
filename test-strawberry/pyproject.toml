@@ -6,7 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.115.11",
     "ipdb>=0.13.13",
-    "sentry-sdk[strawberry]",
+    "sentry-sdk[strawberry]>=2.68.1",
     "strawberry-graphql[fastapi]>=0.243.0",
     "uvicorn>=0.34.0",
 ]
