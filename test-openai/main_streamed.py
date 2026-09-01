@@ -3,6 +3,7 @@ import os
 from openai import OpenAI
 
 import sentry_sdk
+import sentry_sdk.traces
 from sentry_sdk.ai.monitoring import ai_track
 from sentry_sdk.integrations.openai import OpenAIIntegration
 from sentry_sdk.integrations.stdlib import StdlibIntegration
@@ -10,7 +11,7 @@ from sentry_sdk.integrations.stdlib import StdlibIntegration
 
 @ai_track("Streamed OpenAI workflow")
 def streamed_workflow(client):
-    with sentry_sdk.start_transaction(name="openai-streamed"):
+    with sentry_sdk.traces.start_span(name="openai-streamed"):
         # Chat Completions API with streaming
         print("Starting streamed chat completion...")
         stream = client.chat.completions.create(

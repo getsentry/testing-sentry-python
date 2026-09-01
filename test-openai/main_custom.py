@@ -3,6 +3,7 @@ import os
 from openai import OpenAI
 
 import sentry_sdk
+import sentry_sdk.traces
 from sentry_sdk.consts import SPANTEMPLATE, SPANDATA
 from sentry_sdk.integrations.openai import OpenAIIntegration
 from sentry_sdk.integrations.stdlib import StdlibIntegration
@@ -65,7 +66,7 @@ def main():
         api_key=os.environ.get("OPENAI_API_KEY"),
     )
 
-    with sentry_sdk.start_transaction(name="main"):
+    with sentry_sdk.traces.start_span(name="main"):
         my_socalled_agent(client)
 
     print("--------------------------------")

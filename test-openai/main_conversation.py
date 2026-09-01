@@ -4,6 +4,7 @@ import uuid
 from openai import OpenAI
 
 import sentry_sdk
+import sentry_sdk.traces
 from sentry_sdk.ai.monitoring import ai_track
 from sentry_sdk.ai.utils import set_conversation_id
 from sentry_sdk.integrations.openai import OpenAIIntegration
@@ -21,7 +22,7 @@ def conversation_workflow(client):
 
     messages = []
 
-    with sentry_sdk.start_transaction(name="openai-conversation"):
+    with sentry_sdk.traces.start_span(name="openai-conversation"):
         # Turn 1: Initial question
         messages.append({"role": "user", "content": "Hi! I'm planning a trip to Japan. What's the best time to visit?"})
 
@@ -80,7 +81,7 @@ def interleaved_conversations_workflow(client):
     messages_a = []
     messages_b = []
 
-    with sentry_sdk.start_transaction(name="openai-interleaved-conversations"):
+    with sentry_sdk.traces.start_span(name="openai-interleaved-conversations"):
         # Conversation A - Turn 1
         set_conversation_id(conversation_id_a)
         messages_a.append({"role": "user", "content": "I want to learn Python. Where should I start?"})

@@ -3,6 +3,7 @@ import os
 from openai import OpenAI
 
 import sentry_sdk
+import sentry_sdk.traces
 from sentry_sdk.ai.monitoring import ai_track
 from sentry_sdk.integrations.openai import OpenAIIntegration
 from sentry_sdk.integrations.stdlib import StdlibIntegration
@@ -24,7 +25,7 @@ def generate_long_message(index):
 
 @ai_track("My truncation test workflow")
 def my_truncation_workflow(client):
-    with sentry_sdk.start_transaction(name="openai-truncation-test"):
+    with sentry_sdk.traces.start_span(name="openai-truncation-test"):
         messages = []
         
         for i in range(25):
