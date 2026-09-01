@@ -29,7 +29,7 @@ def flatten_trace_context(prefix, context):
     }
 
 
-def set_scope_trace_contexts(span):
+def set_span_attributes(span):
     span.set_attributes(
         {
             **flatten_trace_context(
@@ -46,7 +46,7 @@ def set_scope_trace_contexts(span):
 
 async def task_kafka_consumer(name):
     with sentry_sdk.traces.start_span(name=f"Consume {name}") as span:
-        set_scope_trace_contexts(span)
+        set_span_attributes(span)
         print(f"Consume {name} starting")
         await asyncio.sleep(0.4)
         print(f"Consume {name} completed")
@@ -54,7 +54,7 @@ async def task_kafka_consumer(name):
 
 async def task_kafka_producer(name):
     with sentry_sdk.traces.start_span(name=f"Produce {name}") as span:
-        set_scope_trace_contexts(span)
+        set_span_attributes(span)
 
         print(f"Producer {name} starting")
         await asyncio.sleep(0.01)
@@ -75,7 +75,7 @@ async def main():
     )
 
     with sentry_sdk.traces.start_span(name="main (created by FastAPI)") as span:
-        set_scope_trace_contexts(span)
+        set_span_attributes(span)
 
         # Create some tasks
         tasks = []
