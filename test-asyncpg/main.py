@@ -23,6 +23,7 @@ async def main():
         "dsn": os.getenv("SENTRY_DSN", None),
         "environment": os.getenv("ENV", "local"),
         "traces_sample_rate": 1.0,
+        "trace_lifecycle": "stream",
         "send_default_pii": True,
         "debug": True,
         "integrations": [AsyncPGIntegration()],
