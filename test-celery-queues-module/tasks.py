@@ -24,6 +24,7 @@ def connect_sentry(**kwargs):
         "environment": os.getenv("ENV", "celery.consumer"),
         "release": "0.0.0",
         "traces_sample_rate": 1.0,
+        "trace_lifecycle": "stream",
         "send_default_pii": True,
         "debug": True,
         "integrations": [CeleryIntegration()],
