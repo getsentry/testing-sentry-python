@@ -28,6 +28,7 @@ def concect_sentry(**kwargs):
         environment="dev.celery",
         release="0.0.0",
         traces_sample_rate=1,
+        trace_lifecycle="stream",
         debug=True,
     )
 
