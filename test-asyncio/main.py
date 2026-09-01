@@ -3,22 +3,53 @@ import os
 import random
 
 import sentry_sdk
+import sentry_sdk.traces
 from sentry_sdk.integrations.asyncio import AsyncioIntegration
 
 
+def set_trace_context_attributes(span, prefix, context):
+    """Record a trace context on a streamed span as attributes.
+
+    Streamed spans have no concept of context, so values that used to be set
+    via `set_context()` are set as attributes instead. Attributes hold scalars
+    (or lists of scalars), so nested dicts such as `dynamic_sampling_context`
+    are flattened with dotted keys. Passing a dict straight to
+    `set_attribute()` does not raise -- it stringifies it with `repr()` into an
+    unparseable blob -- so flatten explicitly.
+    """
+    for key, value in (context or {}).items():
+        if value is None:
+            continue
+        if isinstance(value, dict):
+            set_trace_context_attributes(span, f"{prefix}.{key}", value)
+        else:
+            span.set_attribute(f"{prefix}.{key}", value)
+
+
+def set_scope_trace_contexts(span):
+    set_trace_context_attributes(
+        span,
+        "current-scope-trace-context",
+        sentry_sdk.get_current_scope().get_trace_context() or {"empty": True},
+    )
+    set_trace_context_attributes(
+        span,
+        "isolation-scope-trace-context",
+        sentry_sdk.get_isolation_scope().get_trace_context(),
+    )
+
+
 async def task_kafka_consumer(name):
-    with sentry_sdk.start_transaction(name=f"Consume {name}") as trx:
-        trx.set_context("current-scope-trace-context", sentry_sdk.get_current_scope().get_trace_context() or {"empty": True})
-        trx.set_context("isolation-scope-trace-context", sentry_sdk.get_isolation_scope().get_trace_context())
+    with sentry_sdk.traces.start_span(name=f"Consume {name}") as span:
+        set_scope_trace_contexts(span)
         print(f"Consume {name} starting")
         await asyncio.sleep(0.4)
         print(f"Consume {name} completed")
 
 
 async def task_kafka_producer(name):
-    with sentry_sdk.start_transaction(name=f"Produce {name}") as trx:
-        trx.set_context("current-scope-trace-context", sentry_sdk.get_current_scope().get_trace_context() or {"empty": True})
-        trx.set_context("isolation-scope-trace-context", sentry_sdk.get_isolation_scope().get_trace_context())
+    with sentry_sdk.traces.start_span(name=f"Produce {name}") as span:
+        set_scope_trace_contexts(span)
 
         print(f"Producer {name} starting")
         await asyncio.sleep(0.01)
@@ -38,9 +69,8 @@ async def main():
         ], 
     )
 
-    with sentry_sdk.start_transaction(name="main (created by FastAPI)") as trx:
-        trx.set_context("current-scope-trace-context", sentry_sdk.get_current_scope().get_trace_context() or {"empty": True})
-        trx.set_context("isolation-scope-trace-context", sentry_sdk.get_isolation_scope().get_trace_context())
+    with sentry_sdk.traces.start_span(name="main (created by FastAPI)") as span:
+        set_scope_trace_contexts(span)
 
         # Create some tasks
         tasks = []
