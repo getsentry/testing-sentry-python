@@ -6,7 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
     "ipdb>=0.13.13",
     "pyramid>=2.0",
-    "sentry-sdk[pyramid]",
+    "sentry-sdk[pyramid]>=2.68.1",
     "waitress>=3.0",
 ]
 
