@@ -110,7 +110,7 @@ def main():
         api_key=os.environ.get("ANTHROPIC_API_KEY"),
     )
 
-    with sentry_sdk.traces.start_span(name="anthropic-sync-tool", attributes={"sentry.op": "anthropic-sync-tool"}):
+    with sentry_sdk.traces.start_span(name="anthropic-sync-tool"):
         my_custom_agent(client)
 
 

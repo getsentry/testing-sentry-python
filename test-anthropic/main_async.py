@@ -63,7 +63,7 @@ async def main():
         api_key=os.environ.get("ANTHROPIC_API_KEY"),
     )
 
-    with sentry_sdk.traces.start_span(name="anthropic-async", attributes={"sentry.op": "anthropic-async"}):
+    with sentry_sdk.traces.start_span(name="anthropic-async"):
         await my_custom_agent(client)
 
 
