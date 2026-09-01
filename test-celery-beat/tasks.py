@@ -25,9 +25,9 @@ app.conf.beat_schedule = {
 }
 app.conf.timezone = 'UTC'
 
-def before_send_transaction(event, hint):
-    print(event)
-    return event
+def before_send_span(span, hint):
+    print(span)
+    return span
 
 exclude_beat_tasks=[]
 
@@ -44,7 +44,8 @@ def connect_sentry(**kwargs):
         "integrations": [
             CeleryIntegration(monitor_beat_tasks=True, exclude_beat_tasks=exclude_beat_tasks),
         ],
-        "before_send_transaction": before_send_transaction,
+        "before_send_span": before_send_span,
+        "trace_lifecycle": "stream",
     }
     print(f"Sentry Settings: {sentry_settings}")
     sentry_sdk.init(**sentry_settings)
