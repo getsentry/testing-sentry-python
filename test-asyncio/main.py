@@ -31,6 +31,7 @@ async def main():
         dsn=os.getenv("SENTRY_DSN", None),
         environment=os.getenv("ENV", "local"),
         traces_sample_rate=1.0,
+        trace_lifecycle="stream",
         debug=True,
         integrations=[
             AsyncioIntegration(),  # IMPORTANT: We need to enable this by hand!
