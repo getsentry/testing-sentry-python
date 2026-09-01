@@ -59,31 +59,25 @@ def streamed_workflow(client):
         print("--------------------------------")
 
 
-def before_send_transaction(event, hint):
-    """Print gen_ai attributes from all spans before sending transaction."""
-    print("\n" + "=" * 80)
-    print("TRANSACTION EVENT - Printing all spans with gen_ai attributes")
-    print("=" * 80)
+def before_send_span(span, hint):
+    """Print gen_ai attributes from each span before sending it."""
+    name = span.get("name", "unknown")
+    span_id = span.get("span_id", "unknown")
+    attributes = span.get("attributes", {})
 
-    spans = event.get("spans", [])
-    for span in spans:
-        op = span.get("op", "unknown")
-        description = span.get("description", "no description")
-        span_id = span.get("span_id", "unknown")
-        data = span.get("data", {})
+    # Filter gen_ai prefixed attributes
+    gen_ai_attrs = {k: v for k, v in attributes.items() if k.startswith("gen_ai")}
 
-        # Filter gen_ai prefixed attributes
-        gen_ai_attrs = {k: v for k, v in data.items() if k.startswith("gen_ai")}
+    if gen_ai_attrs:
+        print("\n" + "=" * 80)
+        print(f"SPAN: {name}")
+        print(f"Span ID: {span_id}")
+        print("gen_ai attributes:")
+        for key, value in sorted(gen_ai_attrs.items()):
+            print(f"  {key}: {value}")
+        print("=" * 80 + "\n")
 
-        if gen_ai_attrs:
-            print(f"\nSPAN: {op} - {description}")
-            print(f"Span ID: {span_id}")
-            print("gen_ai attributes:")
-            for key, value in sorted(gen_ai_attrs.items()):
-                print(f"  {key}: {value}")
-
-    print("=" * 80 + "\n")
-    return event
+    return span
 
 
 def main():
@@ -91,10 +85,11 @@ def main():
         dsn=os.getenv("SENTRY_DSN", None),
         environment=os.getenv("ENV", "openai-test-streamed"),
         traces_sample_rate=1.0,
+        trace_lifecycle="stream",
         profiles_sample_rate=1.0,
         send_default_pii=True,
         debug=True,
-        before_send_transaction=before_send_transaction,
+        before_send_span=before_send_span,
         integrations=[
             OpenAIIntegration(
                 include_prompts=True,

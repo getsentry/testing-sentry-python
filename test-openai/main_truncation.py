@@ -69,6 +69,7 @@ def main():
         dsn=os.getenv("SENTRY_DSN", None),
         environment=os.getenv("ENV", "openai-test-truncation"),
         traces_sample_rate=1.0,
+        trace_lifecycle="stream",
         profiles_sample_rate=1.0,
         send_default_pii=True,
         debug=True,
