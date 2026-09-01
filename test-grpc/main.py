@@ -1,6 +1,7 @@
 import os
 
 import sentry_sdk
+import sentry_sdk.traces
 from sentry_sdk.integrations.clickhouse_driver import ClickhouseDriverIntegration
 
 from clickhouse_driver import Client
@@ -19,7 +20,7 @@ def main():
 
     sentry_sdk.init(**sentry_settings)
 
-    with sentry_sdk.start_transaction(op="function", name="clickhouse_driver"):
+    with sentry_sdk.traces.start_span(name="clickhouse_driver", attributes={"sentry.op": "function"}):
         client = Client(host='localhost', )
         client.execute("DROP TABLE IF EXISTS test")
         client.execute("CREATE TABLE test (x Int32) ENGINE = Memory")
