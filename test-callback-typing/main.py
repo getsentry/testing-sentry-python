@@ -2,7 +2,7 @@ import asyncio
 import os
 
 import sentry_sdk
-from sentry_sdk.types import Event, Hint, SamplingContext, Breadcrumb, BreadcrumbHint, MonitorConfig
+from sentry_sdk.types import Event, Hint, SamplingContext, Breadcrumb, BreadcrumbHint, MonitorConfig, SpanJSON
 from sentry_sdk.crons import MonitorStatus, capture_checkin
 
 
@@ -22,8 +22,8 @@ def my_before_send(event: Event, hint: Hint) -> Event | None:
     return event
 
 
-def my_before_send_transaction(event: Event, hint: Hint) -> Event | None:
-    return event
+def my_before_send_span(span: SpanJSON, hint: Hint) -> SpanJSON:
+    return span
 
 
 def my_before_breadcrumb(crumb: Breadcrumb, hint: BreadcrumbHint) -> Breadcrumb | None:
@@ -37,6 +37,7 @@ async def main() -> None:
         dsn=os.getenv("SENTRY_DSN", None),
         environment=os.getenv("ENV", "local"),
         traces_sample_rate=1.0,
+        trace_lifecycle="stream",
         profiles_sample_rate=1.0,
         send_default_pii=True,
         debug=True,
@@ -44,7 +45,7 @@ async def main() -> None:
         traces_sampler=my_traces_sampler,
         profiles_sampler=my_profiles_sampler,
         before_send=my_before_send,
-        before_send_transaction=my_before_send_transaction,
+        before_send_span=my_before_send_span,
         before_breadcrumb=my_before_breadcrumb,
     )
 

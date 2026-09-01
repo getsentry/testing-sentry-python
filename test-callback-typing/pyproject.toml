@@ -7,7 +7,7 @@ dependencies = [
     "ipdb>=0.13.13",
     "mypy>=1.15.0",
     "ruff>=0.11.5",
-    "sentry-sdk",
+    "sentry-sdk>=2.68.1",
     "typing-extensions>=4.13.2",
 ]
 
