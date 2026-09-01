@@ -7,35 +7,40 @@ import sentry_sdk.traces
 from sentry_sdk.integrations.asyncio import AsyncioIntegration
 
 
-def set_trace_context_attributes(span, prefix, context):
-    """Record a trace context on a streamed span as attributes.
+def flatten_trace_context(prefix, context):
+    """Flatten a trace context dict into scalar span attributes.
 
     Streamed spans have no concept of context, so values that used to be set
-    via `set_context()` are set as attributes instead. Attributes hold scalars
-    (or lists of scalars), so nested dicts such as `dynamic_sampling_context`
-    are flattened with dotted keys. Passing a dict straight to
-    `set_attribute()` does not raise -- it stringifies it with `repr()` into an
-    unparseable blob -- so flatten explicitly.
+    via `set_context()` become attributes. Two wrinkles force the flattening:
+    `get_trace_context()` nests a `dynamic_sampling_context` dict, and
+    `set_attribute()` coerces a dict with `repr()` rather than rejecting it,
+    which would yield an unparseable blob. Prefixing also keeps the current
+    and isolation scopes from overwriting each other's identically named keys.
     """
+    flat = {}
     for key, value in (context or {}).items():
         if value is None:
+            # Would otherwise serialize as the string "None".
             continue
         if isinstance(value, dict):
-            set_trace_context_attributes(span, f"{prefix}.{key}", value)
+            flat.update(flatten_trace_context(f"{prefix}.{key}", value))
         else:
-            span.set_attribute(f"{prefix}.{key}", value)
+            flat[f"{prefix}.{key}"] = value
+    return flat
 
 
 def set_scope_trace_contexts(span):
-    set_trace_context_attributes(
-        span,
-        "current-scope-trace-context",
-        sentry_sdk.get_current_scope().get_trace_context() or {"empty": True},
-    )
-    set_trace_context_attributes(
-        span,
-        "isolation-scope-trace-context",
-        sentry_sdk.get_isolation_scope().get_trace_context(),
+    span.set_attributes(
+        {
+            **flatten_trace_context(
+                "current-scope-trace-context",
+                sentry_sdk.get_current_scope().get_trace_context() or {"empty": True},
+            ),
+            **flatten_trace_context(
+                "isolation-scope-trace-context",
+                sentry_sdk.get_isolation_scope().get_trace_context(),
+            ),
+        }
     )
 
 
