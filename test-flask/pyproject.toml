@@ -9,7 +9,7 @@ dependencies = [
     "flask>=3.1.1",
     "ipdb>=0.13.13",
     "markupsafe>=3.0.2",
-    "sentry-sdk[flask]",
+    "sentry-sdk[flask]>=2.68.1",
     "sqlalchemy>=2.0.38",
 ]
 
