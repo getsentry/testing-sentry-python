@@ -15,6 +15,7 @@ from sentry_sdk.integrations.celery import CeleryIntegration
 sentry_sdk.init(
     dsn=os.environ.get("SENTRY_DSN"),
     enable_tracing=True,
+    trace_lifecycle="stream",
     debug=True,
     send_default_pii=True,
     integrations=[
