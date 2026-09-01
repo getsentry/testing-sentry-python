@@ -9,6 +9,7 @@ sentry_settings = {
     "traces_sample_rate": 1.0,
     # "send_default_pii": True,
     "debug": True,
+    "trace_lifecycle": "stream",
     "integrations": [ArqIntegration()],
 }
 print(f"Sentry Settings: {sentry_settings}")
