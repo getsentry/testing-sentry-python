@@ -7,6 +7,7 @@ def main():
     sentry_sdk.init(
         dsn=os.environ["SENTRY_DSN"],
         traces_sample_rate=1.0,
+        trace_lifecycle="stream",
         debug=True,
     )
 
