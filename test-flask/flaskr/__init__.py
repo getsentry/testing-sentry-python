@@ -13,6 +13,7 @@ def create_app(test_config=None):
         environment='development',
         release='unknown',
         traces_sample_rate=1.0,
+        trace_lifecycle="stream",
         enable_db_query_source=True,
         db_query_source_threshold_ms=0,
         debug=True,
