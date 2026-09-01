@@ -3,7 +3,7 @@ import os
 import sentry_sdk
 from sentry_sdk.integrations.celery import CeleryIntegration
 
-from tasks import task_a, task_b, before_send_transaction
+from tasks import task_a, task_b, before_send_span
 
 exclude_beat_tasks = []
 
@@ -18,8 +18,9 @@ def main():
         "debug": True,
         "integrations": [
             CeleryIntegration(monitor_beat_tasks=True, exclude_beat_tasks=exclude_beat_tasks),
-        ], 
-        "before_send_transaction": before_send_transaction,
+        ],
+        "before_send_span": before_send_span,
+        "trace_lifecycle": "stream",
     }
     print(f"Sentry Settings: {sentry_settings}")
     sentry_sdk.init(**sentry_settings)
