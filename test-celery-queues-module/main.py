@@ -12,6 +12,7 @@ def main():
         "environment": os.getenv("ENV", "celery.producer"),
         "release": "0.0.0",        
         "traces_sample_rate": 1.0,
+        "trace_lifecycle": "stream",
         "send_default_pii": True,
         "debug": True,
         "integrations": [CeleryIntegration()]
