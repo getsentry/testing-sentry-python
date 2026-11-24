@@ -1,7 +1,9 @@
 
 from celery import Celery, signals
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.celery import CeleryIntegration
 
 # 'python' project on Sentry.io
@@ -20,7 +22,22 @@ def connect_sentry(**kwargs):
             CeleryIntegration(
                 propagate_traces=False,
             ),
+            LoggingIntegration(event_level=logging.ERROR, level=None),
         ], 
+        data_collection={
+            "user_info": False,
+            "http_bodies": [],
+            "graphql": {"document": False, "variables": False},
+            "gen_ai": {"inputs": False, "outputs": False},
+            "mcp": {"inputs": False, "outputs": False},
+            "database_query_data": False,
+            "queues": False,
+            "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+            "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "stack_frame_variables": {"mode": "denylist"},
+        },
+        attach_stacktrace=False,
     )
 
 

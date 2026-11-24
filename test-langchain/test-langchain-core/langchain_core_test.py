@@ -8,16 +8,17 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
+import logging
 import sentry_sdk
-from sentry_sdk.ai.monitoring import ai_track
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.langchain import LangchainIntegration
 from sentry_sdk.integrations.openai import OpenAIIntegration
 
 dotenv.load_dotenv()
 
-@ai_track("My LangChain Core pipeline")
+@sentry_sdk.trace(name="My LangChain Core pipeline", attributes={"sentry.op": "ai.pipeline"})
 def my_pipeline(llm):    
-    with sentry_sdk.start_transaction(name="langchain-core-demo"):
+    with sentry_sdk.start_span(name="langchain-core-demo"):
         # Direct message invocation
         messages = [HumanMessage(content="Hello there! How are you?")]
         response = llm.invoke(messages)
@@ -94,12 +95,14 @@ def main():
         dsn=os.getenv("SENTRY_DSN", None),
         environment=os.getenv("ENV", "local"),
         traces_sample_rate=1.0,
-        send_default_pii=True,
         debug=True,
         integrations=[
-            LangchainIntegration(include_prompts=True), 
+            LangchainIntegration(), 
+            LoggingIntegration(event_level=logging.ERROR, level=None),
         ],
         disabled_integrations=[OpenAIIntegration()],
+        data_collection={"stack_frame_variables": {"mode": "denylist"}},
+        attach_stacktrace=False,
     )
 
     # Initialize OpenAI LLM

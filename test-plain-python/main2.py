@@ -1,6 +1,9 @@
 import os
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
+from sentry_sdk.scope import use_scope
 
 
 
@@ -9,10 +12,40 @@ def main():
         dsn=os.environ["SENTRY_DSN"],
         traces_sample_rate=1.0,
         debug=True,
+        integrations=[LoggingIntegration(event_level=logging.ERROR, level=None)],
+        data_collection={
+            "user_info": False,
+            "http_bodies": [],
+            "graphql": {"document": False, "variables": False},
+            "gen_ai": {"inputs": False, "outputs": False},
+            "mcp": {"inputs": False, "outputs": False},
+            "database_query_data": False,
+            "queues": False,
+            "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+            "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "stack_frame_variables": {"mode": "denylist"},
+        },
+        attach_stacktrace=False,
     )
 
     client = sentry_sdk.Client(
         dsn="http://123@localhost:9999/0",
+        integrations=[LoggingIntegration(event_level=logging.ERROR, level=None)],
+        data_collection={
+            "user_info": False,
+            "http_bodies": [],
+            "graphql": {"document": False, "variables": False},
+            "gen_ai": {"inputs": False, "outputs": False},
+            "mcp": {"inputs": False, "outputs": False},
+            "database_query_data": False,
+            "queues": False,
+            "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+            "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "stack_frame_variables": {"mode": "denylist"},
+        },
+        attach_stacktrace=False,
     )
 
     scope = sentry_sdk.get_current_scope().fork()
@@ -23,7 +56,7 @@ def main():
         "level": "error",
     }
 
-    with sentry_sdk.use_scope(scope):
+    with use_scope(scope):
         event_id = scope.capture_event(event)
         print(event_id)
 

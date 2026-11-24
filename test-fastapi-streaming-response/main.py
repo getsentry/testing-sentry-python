@@ -1,6 +1,8 @@
 import os
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
 
 from fastapi import FastAPI
@@ -12,19 +14,34 @@ sentry_sdk.init(
     traces_sample_rate=1.0,
     integrations=[
         StarletteIntegration(middleware_spans=False),
+        LoggingIntegration(event_level=logging.ERROR, level=None),
     ],
     debug=True,
+    data_collection={
+        "user_info": False,
+        "http_bodies": ["incoming_request"],
+        "graphql": {"document": False, "variables": False},
+        "gen_ai": {"inputs": False, "outputs": False},
+        "mcp": {"inputs": False, "outputs": False},
+        "database_query_data": False,
+        "queues": False,
+        "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+        "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "stack_frame_variables": {"mode": "denylist"},
+    },
+    attach_stacktrace=False,
 )
 
 app = FastAPI()
 
 
 def generate_response():
-    with sentry_sdk.start_span(description="SPAN Stream Response Generator", op="demo.function") as span:
+    with sentry_sdk.start_span(name="SPAN Stream Response Generator", attributes={"sentry.op": "demo.function"}) as span:
         print(f"SPAN START generator: {span}")
-        span.set_data("more", "value")
+        span.set_attribute("more", "value")
         for i in range(3):
-            with sentry_sdk.start_span(description="Stream Chunk", op="demo.function") as span2:
+            with sentry_sdk.start_span(name="Stream Chunk", attributes={"sentry.op": "demo.function"}) as span2:
                 print(f"SPAN START chunk: {span2}")
                 yield f"Hello, {i} World!\n"
 
@@ -35,9 +52,9 @@ def generate_response():
 
 @app.get("/")
 def hello() -> str:
-    with sentry_sdk.start_span(description="SPAN Streaming View", op="demo.function") as span:
+    with sentry_sdk.start_span(name="SPAN Streaming View", attributes={"sentry.op": "demo.function"}) as span:
         print(f"SPAN START view: {span}")
-        span.set_data("some", "value")
+        span.set_attribute("some", "value")
         print(span)
         output = StreamingResponse(generate_response(), media_type='text/event-stream')
 

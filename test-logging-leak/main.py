@@ -5,6 +5,7 @@ import os
 import time
 
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 import logging
 logger = logging.getLogger()
@@ -20,12 +21,27 @@ async def main():
         # "send_default_pii": True,
         # "debug": True,
         # "integrations": [],
+        "integrations": [LoggingIntegration(event_level=logging.ERROR, level=None)],
+        "data_collection": {
+            "user_info": False,
+            "http_bodies": ["incoming_request"],
+            "graphql": {"document": False, "variables": False},
+            "gen_ai": {"inputs": False, "outputs": False},
+            "mcp": {"inputs": False, "outputs": False},
+            "database_query_data": False,
+            "queues": False,
+            "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+            "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "stack_frame_variables": {"mode": "denylist"},
+        },
+        "attach_stacktrace": False,
     }
     print(f"Sentry Settings: {sentry_settings}")
 
     sentry_sdk.init(**sentry_settings)
 
-    with sentry_sdk.start_transaction(op="function", name="logging-leak"):
+    with sentry_sdk.start_span(name="logging-leak", attributes={"sentry.op": "function"}):
         async with aiohttp.ClientSession() as s:
             resp = await s.get(
                 "https://example.com/api/v2/session/",

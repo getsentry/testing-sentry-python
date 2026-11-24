@@ -4,14 +4,15 @@ import os
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 
+import logging
 import sentry_sdk
-from sentry_sdk.ai.monitoring import ai_track
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.langchain import LangchainIntegration
 
 
-@ai_track("My async LangChain AI pipeline")
+@sentry_sdk.trace(name="My async LangChain AI pipeline", attributes={"sentry.op": "ai.pipeline"})
 async def my_pipeline(llm):    
-    with sentry_sdk.start_transaction(name="langchain-async"):
+    with sentry_sdk.start_span(name="langchain-async"):
         # Async create message
         messages = [
             SystemMessage(content="You are a helpful assistant."),
@@ -32,11 +33,13 @@ async def main():
         dsn=os.getenv("SENTRY_DSN", None),
         environment=os.getenv("ENV", "local"),
         traces_sample_rate=1.0,
-        send_default_pii=True,
         debug=True,
         integrations=[
-            LangchainIntegration(include_prompts=True), 
+            LangchainIntegration(), 
+            LoggingIntegration(event_level=logging.ERROR, level=None),
         ],
+        data_collection={"stack_frame_variables": {"mode": "denylist"}},
+        attach_stacktrace=False,
     )
 
     import random

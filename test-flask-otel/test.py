@@ -1,26 +1,34 @@
+import logging
 import time
 import os
 
 import sentry_sdk
 from opentelemetry import trace
-from opentelemetry.propagate import set_global_textmap
-from opentelemetry.sdk.trace import TracerProvider
-from sentry_sdk.integrations.opentelemetry import SentryPropagator, SentrySpanProcessor
+from sentry_sdk.integrations.logging import LoggingIntegration
+from sentry_sdk.integrations.otlp import OTLPIntegration
 
 sentry_sdk.init(
     dsn=os.environ["SENTRY_DSN"],
-    enable_tracing=True,
-    instrumenter="otel",
-    _experiments={
-        "otel_powered_performance": True, 
+    integrations=[
+        OTLPIntegration(setup_propagator=True),
+        LoggingIntegration(event_level=logging.ERROR, level=None),
+    ],
+    data_collection={
+        "user_info": False,
+        "http_bodies": ["incoming_request"],
+        "graphql": {"document": False, "variables": False},
+        "gen_ai": {"inputs": False, "outputs": False},
+        "mcp": {"inputs": False, "outputs": False},
+        "database_query_data": False,
+        "queues": False,
+        "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+        "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "stack_frame_variables": {"mode": "denylist"},
     },
+    attach_stacktrace=False,
     debug=True,
 )
-
-provider = TracerProvider()
-provider.add_span_processor(SentrySpanProcessor())
-trace.set_tracer_provider(provider)
-set_global_textmap(SentryPropagator())
 
 tracer = trace.get_tracer(__name__)
 

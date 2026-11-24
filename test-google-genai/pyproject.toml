@@ -8,7 +8,7 @@ dependencies = [
     "google-genai",
     "google-auth",
     "google-cloud-aiplatform",
-    "sentry-sdk",
+    "sentry-sdk>=3.0.0",
     "pip>=25.2",
     "python-dotenv>=1.1.1",
 ]

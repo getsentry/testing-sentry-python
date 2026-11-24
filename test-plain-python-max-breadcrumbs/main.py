@@ -3,6 +3,7 @@ import logging
 import os
 
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 
 logger = logging.getLogger(__name__)
@@ -16,9 +17,24 @@ async def main():
         traces_sample_rate=1.0,
         debug=True,
         max_breadcrumbs=3,
+        integrations=[LoggingIntegration(event_level=logging.ERROR, level=None)],
+        data_collection={
+            "user_info": False,
+            "http_bodies": [],
+            "graphql": {"document": False, "variables": False},
+            "gen_ai": {"inputs": False, "outputs": False},
+            "mcp": {"inputs": False, "outputs": False},
+            "database_query_data": False,
+            "queues": False,
+            "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+            "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "stack_frame_variables": {"mode": "denylist"},
+        },
+        attach_stacktrace=False,
     )
 
-    with sentry_sdk.start_transaction(op="function", name="test-transaction"):
+    with sentry_sdk.start_span(name="test-transaction", attributes={"sentry.op": "function"}):
         logger.info("breadcrumb 1", extra=dict(foo=42, password="secret"))
         logger.info("breadcrumb 2", extra=dict(foo=1, password="secret"))
         logger.info("breadcrumb 3", extra=dict(bar=2, auth="secret"))

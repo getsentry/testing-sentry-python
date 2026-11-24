@@ -86,10 +86,25 @@ sentry_sdk.init(
     environment='local',
     integrations=[
         LoggingIntegration(
-            level=logging.INFO,
-            event_level=logging.INFO,  #WARNING,
+            breadcrumb_level=logging.INFO,
+            event_level=logging.INFO,
+            level=None,  #WARNING,
         ),
     ],
+    data_collection={
+        "user_info": False,
+        "http_bodies": ["incoming_request"],
+        "graphql": {"document": False, "variables": False},
+        "gen_ai": {"inputs": False, "outputs": False},
+        "mcp": {"inputs": False, "outputs": False},
+        "database_query_data": False,
+        "queues": False,
+        "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+        "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "stack_frame_variables": {"mode": "denylist"},
+    },
+    attach_stacktrace=False,
 )
 
 

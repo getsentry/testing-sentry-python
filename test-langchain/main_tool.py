@@ -8,8 +8,9 @@ from langchain_core.tools import tool
 from langchain.agents import create_tool_calling_agent, AgentExecutor
 from langchain_core.prompts import ChatPromptTemplate
 
+import logging
 import sentry_sdk
-from sentry_sdk.ai.monitoring import ai_track
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.langchain import LangchainIntegration
 from sentry_sdk.integrations.openai import OpenAIIntegration
 from sentry_sdk.integrations.anthropic import AnthropicIntegration
@@ -123,10 +124,10 @@ def create_agent_executor(llm, tools):
     return AgentExecutor(agent=agent, tools=tools, verbose=True)
 
 
-@ai_track("Individual LangChain tool test")
+@sentry_sdk.trace(name="Individual LangChain tool test", attributes={"sentry.op": "ai.pipeline"})
 def run_test_case(agent_executor, test_name, input_text, expect_error=False):
     """Run a single test case in its own transaction."""
-    with sentry_sdk.start_transaction(name=f"langchain-tool-{test_name}"):
+    with sentry_sdk.start_span(name=f"langchain-tool-{test_name}"):
         print(f"\n{test_name}:")
         try:
             if "streaming" in test_name.lower():
@@ -145,7 +146,7 @@ def run_test_case(agent_executor, test_name, input_text, expect_error=False):
                 raise
 
 
-@ai_track("My sync LangChain tool AI pipeline")
+@sentry_sdk.trace(name="My sync LangChain tool AI pipeline", attributes={"sentry.op": "ai.pipeline"})
 def my_pipeline(llm, tools, provider_name="unknown"):
     # Create agent executor once upfront
     agent_executor = create_agent_executor(llm, tools)
@@ -204,12 +205,14 @@ def main():
         dsn=os.getenv("SENTRY_DSN", None),
         environment=os.getenv("ENV", "local"),
         traces_sample_rate=1.0,
-        send_default_pii=True,
         debug=True,
         integrations=[
-            LangchainIntegration(include_prompts=True),
+            LangchainIntegration(),
+            LoggingIntegration(event_level=logging.ERROR, level=None),
         ],
-        disabled_integrations=[OpenAIIntegration(), AnthropicIntegration()]
+        disabled_integrations=[OpenAIIntegration(), AnthropicIntegration()],
+        data_collection={"stack_frame_variables": {"mode": "denylist"}},
+        attach_stacktrace=False,
     )
 
     tools = [get_weather, calculate_tip, mcp_database_query]

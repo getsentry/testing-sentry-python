@@ -25,4 +25,4 @@ On first startup, the app creates `users` and `posts` tables and seeds sample da
    curl http://localhost:5000/query
    ```
 
-2. Watch the app container logs for the `[before_send_transaction]` output. The callback attempts to match a multiline SQL string against span descriptions but fails to find a match.
+2. Watch the app container logs for the `[before_send_span]` output. The callback attempts to match a multiline SQL string against span descriptions but fails to find a match.

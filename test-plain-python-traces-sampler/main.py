@@ -1,7 +1,9 @@
 import asyncio
 import os
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 def traces_sampler(sampling_context):
     import ipdb; ipdb.set_trace()
@@ -23,9 +25,24 @@ async def main():
         traces_sample_rate=1.0,
         traces_sampler=traces_sampler,
         debug=True,
+        integrations=[LoggingIntegration(event_level=logging.ERROR, level=None)],
+        data_collection={
+            "user_info": False,
+            "http_bodies": [],
+            "graphql": {"document": False, "variables": False},
+            "gen_ai": {"inputs": False, "outputs": False},
+            "mcp": {"inputs": False, "outputs": False},
+            "database_query_data": False,
+            "queues": False,
+            "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+            "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "stack_frame_variables": {"mode": "denylist"},
+        },
+        attach_stacktrace=False,
     )
 
-    with sentry_sdk.start_transaction(op="function", name="transaction-with-traces-sampler-data"):
+    with sentry_sdk.start_span(name="transaction-with-traces-sampler-data", attributes={"sentry.op": "function"}):
         print("Hello, world!")
 
 if __name__ == "__main__":

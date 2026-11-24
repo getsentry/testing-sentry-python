@@ -2,9 +2,10 @@ import os
 
 from openai import OpenAI
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 import sentry_sdk.traces
-from sentry_sdk.ai.monitoring import ai_track
 from sentry_sdk.integrations.openai import OpenAIIntegration
 from sentry_sdk.integrations.stdlib import StdlibIntegration
 import dotenv
@@ -23,7 +24,7 @@ def generate_long_message(index):
     return message[:1000]
 
 
-@ai_track("My truncation test workflow")
+@sentry_sdk.trace(name="My truncation test workflow", attributes={"sentry.op": "ai.pipeline"})
 def my_truncation_workflow(client):
     with sentry_sdk.traces.start_span(name="openai-truncation-test"):
         messages = []
@@ -70,19 +71,18 @@ def main():
         dsn=os.getenv("SENTRY_DSN", None),
         environment=os.getenv("ENV", "openai-test-truncation"),
         traces_sample_rate=1.0,
-        trace_lifecycle="stream",
-        profiles_sample_rate=1.0,
-        send_default_pii=True,
         debug=True,
         integrations=[
             OpenAIIntegration(
-                include_prompts=True,
                 tiktoken_encoding_name="cl100k_base",
             ),
+            LoggingIntegration(event_level=logging.ERROR, level=None),
         ],
         disabled_integrations=[
             StdlibIntegration(),
         ],
+        data_collection={"stack_frame_variables": {"mode": "denylist"}},
+        attach_stacktrace=False,
     )
 
     client = OpenAI(

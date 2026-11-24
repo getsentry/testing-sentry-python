@@ -3,10 +3,12 @@ import random
 import threading
 import time
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 
-@sentry_sdk.tracing.trace
+@sentry_sdk.trace
 def my_function(id):
     print("Function: starting")
     time.sleep(random.randint(0,3))
@@ -27,11 +29,27 @@ if __name__ == "__main__":
         environment=os.environ.get("ENV", "test"),
         # Set rate to 1.0 to capture 100%
         traces_sample_rate=1.0,
-        profiles_sample_rate=1.0,
+        profile_session_sample_rate=1.0,
+        profile_lifecycle="trace",
         debug=True,
+        integrations=[LoggingIntegration(event_level=logging.ERROR, level=None)],
+        data_collection={
+            "user_info": False,
+            "http_bodies": [],
+            "graphql": {"document": False, "variables": False},
+            "gen_ai": {"inputs": False, "outputs": False},
+            "mcp": {"inputs": False, "outputs": False},
+            "database_query_data": False,
+            "queues": False,
+            "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+            "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "stack_frame_variables": {"mode": "denylist"},
+        },
+        attach_stacktrace=False,
     )   
 
-    with sentry_sdk.start_transaction(op="transaction", name="main-transaction"):
+    with sentry_sdk.start_span(name="main-transaction", attributes={"sentry.op": "transaction"}):
         sentry_sdk.add_breadcrumb(message=f"main(): starting threads", category="function", level="info")
         threads = []
 

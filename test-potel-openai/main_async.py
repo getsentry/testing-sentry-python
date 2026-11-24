@@ -3,17 +3,18 @@ import os
 
 from openai import AsyncOpenAI
 
+import logging
 import sentry_sdk
-from sentry_sdk.ai.monitoring import ai_track
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.consts import VERSION as SENTRY_SDK_VERSION
 from sentry_sdk.integrations.openai import OpenAIIntegration
 
 DIR = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 
 
-@ai_track("My async OpenAI pipeline")
+@sentry_sdk.trace(name="My async OpenAI pipeline", attributes={"sentry.op": "ai.pipeline"})
 async def my_pipeline(client):
-    with sentry_sdk.start_transaction(name="openai-async"):
+    with sentry_sdk.start_span(name="openai-async"):
         # Async create message
         message = await client.chat.completions.create(
             messages=[
@@ -59,19 +60,16 @@ async def main():
         environment=f"{DIR}-{SENTRY_SDK_VERSION}-async",
         release=SENTRY_SDK_VERSION,
         integrations=[
-            OpenAIIntegration(include_prompts=True),
+            OpenAIIntegration(),
+            LoggingIntegration(event_level=logging.ERROR),
         ],
         traces_sample_rate=1.0,
-        profiles_sample_rate=1.0,
+        profile_session_sample_rate=1.0,
+        profile_lifecycle="trace",
         debug=True,
-        _experiments={
-            "enable_logs": True,
-        },
         spotlight="http://localhost:9999/api/0/envelope/",
-        # Continuous Profiling (comment out profiles_sample_rate if you enable this)
-        # profile_session_sample_rate=1.0,
-        # profile_lifecycle="trace",
-        send_default_pii=True,
+        data_collection={"stack_frame_variables": {"mode": "denylist"}},
+        attach_stacktrace=False,
     )
 
     client = AsyncOpenAI(

@@ -9,18 +9,20 @@ from celery.schedules import crontab
 from celery import shared_task
 
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.celery import CeleryIntegration
 
 
 sentry_sdk.init(
     dsn=os.environ.get("SENTRY_DSN"),
-    enable_tracing=True,
-    trace_lifecycle="stream",
+    traces_sample_rate=1.0,
     debug=True,
-    send_default_pii=True,
     integrations=[
-        CeleryIntegration(propagate_traces=False)
-    ]
+        CeleryIntegration(propagate_traces=False),
+        LoggingIntegration(event_level=logging.ERROR, level=None),
+    ],
+    data_collection={"stack_frame_variables": {"mode": "denylist"}},
+    attach_stacktrace=False,
 )
 
 app = Celery("tasks", broker='redis://localhost:6379/0')

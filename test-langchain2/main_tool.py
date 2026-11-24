@@ -6,8 +6,9 @@ from langchain_core.tools import tool
 from langchain.agents import create_agent
 from langchain_core.prompts import ChatPromptTemplate
 
+import logging
 import sentry_sdk
-from sentry_sdk.ai.monitoring import ai_track
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.langchain import LangchainIntegration
 
 
@@ -23,9 +24,9 @@ def calculate_tip(bill_amount: float, tip_percentage: float) -> float:
     return bill_amount * (tip_percentage / 100)
 
 
-@ai_track("My sync LangChain tool AI pipeline")
+@sentry_sdk.trace(name="My sync LangChain tool AI pipeline", attributes={"sentry.op": "ai.pipeline"})
 def my_pipeline(llm, tools):
-    with sentry_sdk.start_transaction(name="langchain-sync-tool"):
+    with sentry_sdk.start_span(name="langchain-sync-tool"):
         # Create agent with tools
         agent = create_agent(
             model=llm,
@@ -65,11 +66,13 @@ def main():
         dsn=os.getenv("SENTRY_DSN", None),
         environment=os.getenv("ENV", "local"),
         traces_sample_rate=1.0,
-        send_default_pii=True,
         debug=True,
         integrations=[
-            LangchainIntegration(include_prompts=True),
+            LangchainIntegration(),
+            LoggingIntegration(event_level=logging.ERROR, level=None),
         ],
+        data_collection={"stack_frame_variables": {"mode": "denylist"}},
+        attach_stacktrace=False,
     )
 
     llm = ChatOpenAI(

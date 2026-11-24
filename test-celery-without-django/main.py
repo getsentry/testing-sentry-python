@@ -1,6 +1,8 @@
 import os
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 from tasks import message
 
@@ -12,10 +14,25 @@ def main():
         dsn=os.getenv("SENTRY_DSN", None),
         traces_sample_rate=1.0,
         debug=True,
+        integrations=[LoggingIntegration(event_level=logging.ERROR, level=None)],
+        data_collection={
+            "user_info": False,
+            "http_bodies": [],
+            "graphql": {"document": False, "variables": False},
+            "gen_ai": {"inputs": False, "outputs": False},
+            "mcp": {"inputs": False, "outputs": False},
+            "database_query_data": False,
+            "queues": False,
+            "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+            "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "stack_frame_variables": {"mode": "denylist"},
+        },
+        attach_stacktrace=False,
     )
 
     # Enqueueing a task to be processed by Celery
-    with sentry_sdk.start_transaction(name="calling-a-celery-task"):
+    with sentry_sdk.start_span(name="calling-a-celery-task"):
         result = message.apply_async(
             args=("This should be connected.", ),
         )

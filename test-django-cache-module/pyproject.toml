@@ -14,7 +14,7 @@ dependencies = [
     "psycopg>=3.2.6",
     "pymemcache>=4.0.0",
     "redis>=5.2.1",
-    "sentry-sdk[django]",
+    "sentry-sdk>=3.0.0",
 ]
 
 [tool.uv.sources]

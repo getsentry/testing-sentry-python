@@ -6,8 +6,9 @@ from langchain_core.tools import tool
 from langchain.agents import AgentExecutor, create_openai_tools_agent, create_tool_calling_agent
 
 
+import logging
 import sentry_sdk
-from sentry_sdk.ai.monitoring import ai_track
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.langchain import LangchainIntegration
 from sentry_sdk.integrations.openai import OpenAIIntegration
 
@@ -23,14 +24,16 @@ def main():
         dsn=os.getenv("SENTRY_DSN", None),
         environment=os.getenv("ENV", os.path.basename(os.getcwd())),
         traces_sample_rate=1.0,
-        send_default_pii=True,
         debug=True,
         integrations=[
-            LangchainIntegration(include_prompts=True),
+            LangchainIntegration(),
+            LoggingIntegration(event_level=logging.ERROR, level=None),
         ],
         disabled_integrations=[
             OpenAIIntegration(),
         ],
+        data_collection={"stack_frame_variables": {"mode": "denylist"}},
+        attach_stacktrace=False,
     )
 
     tools = [multiply]
@@ -58,7 +61,7 @@ def main():
     # agent = create_tool_calling_agent(llm, tools, prompt)
     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True).with_config({"run_name": "MyAgent2"})
 
-    with sentry_sdk.start_transaction(name="langchain-sync"):
+    with sentry_sdk.start_span(name="langchain-sync"):
         # res = agent_executor.invoke({"input": "What is 12 * 13? Use the tool."}, config={"run_name": "MyAgent3"})
         # print(res["output"])
         for chunk in agent_executor.stream(

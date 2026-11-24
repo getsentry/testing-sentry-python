@@ -7,7 +7,7 @@ dependencies = [
     "ipdb>=0.13.13",
     "starlette>=0.46.1",
     "uvicorn>=0.34.0",
-    "sentry-sdk[starlette]",
+    "sentry-sdk>=3.0.0",
 ]
 
 [tool.uv.sources]

@@ -3,14 +3,31 @@ import time
 
 from datetime import datetime, timezone
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 
 def main():
     sentry_sdk.init(
         dsn=os.environ["SENTRY_DSN"],
-        enable_tracing=True,
+        traces_sample_rate=1.0,
         debug=True,
+        integrations=[LoggingIntegration(event_level=logging.ERROR, level=None)],
+        data_collection={
+            "user_info": False,
+            "http_bodies": [],
+            "graphql": {"document": False, "variables": False},
+            "gen_ai": {"inputs": False, "outputs": False},
+            "mcp": {"inputs": False, "outputs": False},
+            "database_query_data": False,
+            "queues": False,
+            "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+            "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "stack_frame_variables": {"mode": "denylist"},
+        },
+        attach_stacktrace=False,
     )
 
     # The message you want to send to the queue
@@ -21,12 +38,12 @@ def main():
     ### PUBLISH
 
     # Create the span
-    with sentry_sdk.start_transaction(op="function", name="queue_producer_transaction") as transaction:
-        with sentry_sdk.start_span(op="queue.publish", description="queue_producer") as span:    
+    with sentry_sdk.start_span(name="queue_producer_transaction", attributes={"sentry.op": "function"}) as transaction:
+        with sentry_sdk.start_span(name="queue_producer", attributes={"sentry.op": "queue.publish"}) as span:    
             # Set span data
-            span.set_data("messaging.message.id", message_id)
-            span.set_data("messaging.destination.name", queue)
-            span.set_data("messaging.message.body.size", len(message.encode("utf-8")))
+            span.set_attribute("messaging.message.id", message_id)
+            span.set_attribute("messaging.destination.name", queue)
+            span.set_attribute("messaging.message.body.size", len(message.encode("utf-8")))
             
             ts = int(datetime.now(timezone.utc).timestamp())
 
@@ -65,27 +82,23 @@ def main():
     latency =  now - message_time
 
     # Continue the trace started in the producer
-    transaction = sentry_sdk.continue_trace(
-        message["headers"],
-        op="function",
-        name="queue_consumer_transaction",
-    )
-    with sentry_sdk.start_transaction(transaction):
+    sentry_sdk.continue_trace(message["headers"])
+    with sentry_sdk.start_span(name="queue_consumer_transaction", attributes={"sentry.op": "function"}):
         # Create the span
-        with sentry_sdk.start_span(op="queue.process", description="queue_consumer") as span:
+        with sentry_sdk.start_span(name="queue_consumer", attributes={"sentry.op": "queue.process"}) as span:
             # Set span data
-            span.set_data("messaging.message.id", message["message_id"])
-            span.set_data("messaging.destination.name", queue)
-            span.set_data("messaging.message.body.size", message["body"])
-            span.set_data("messaging.message.receive.latency", latency.total_seconds()*1000)
-            span.set_data("messaging.message.retry.count", 0)
+            span.set_attribute("messaging.message.id", message["message_id"])
+            span.set_attribute("messaging.destination.name", queue)
+            span.set_attribute("messaging.message.body.size", message["body"])
+            span.set_attribute("messaging.message.receive.latency", latency.total_seconds()*1000)
+            span.set_attribute("messaging.message.retry.count", 0)
             
             try:
                 # Process the message
                 # process_message(message)
                 pass
             except Exception:
-                span.set_status("internal_error")            
+                span.status = "error"            
 
 
 if __name__ == "__main__":

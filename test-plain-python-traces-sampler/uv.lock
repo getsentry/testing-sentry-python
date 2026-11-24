@@ -178,7 +178,7 @@ wheels = [
 
 [[package]]
 name = "sentry-sdk"
-version = "2.22.0"
+version = "3.0.0"
 source = { editable = "../../sentry-python" }
 dependencies = [
     { name = "certifi" },
@@ -187,55 +187,23 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aiohttp", marker = "extra == 'aiohttp'", specifier = ">=3.5" },
-    { name = "anthropic", marker = "extra == 'anthropic'", specifier = ">=0.16" },
-    { name = "apache-beam", marker = "extra == 'beam'", specifier = ">=2.12" },
-    { name = "arq", marker = "extra == 'arq'", specifier = ">=0.23" },
     { name = "asttokens", marker = "extra == 'pure-eval'" },
-    { name = "asyncpg", marker = "extra == 'asyncpg'", specifier = ">=0.23" },
     { name = "blinker", marker = "extra == 'flask'", specifier = ">=1.1" },
     { name = "blinker", marker = "extra == 'quart'", specifier = ">=1.1" },
-    { name = "bottle", marker = "extra == 'bottle'", specifier = ">=0.12.13" },
-    { name = "celery", marker = "extra == 'celery'", specifier = ">=3" },
-    { name = "celery-redbeat", marker = "extra == 'celery-redbeat'", specifier = ">=2" },
     { name = "certifi" },
-    { name = "chalice", marker = "extra == 'chalice'", specifier = ">=1.16.0" },
-    { name = "clickhouse-driver", marker = "extra == 'clickhouse-driver'", specifier = ">=0.2.0" },
-    { name = "django", marker = "extra == 'django'", specifier = ">=1.8" },
     { name = "executing", marker = "extra == 'pure-eval'" },
-    { name = "falcon", marker = "extra == 'falcon'", specifier = ">=1.4" },
-    { name = "fastapi", marker = "extra == 'fastapi'", specifier = ">=0.79.0" },
-    { name = "flask", marker = "extra == 'flask'", specifier = ">=0.11" },
+    { name = "flask", marker = "extra == 'flask'" },
     { name = "grpcio", marker = "extra == 'grpcio'", specifier = ">=1.21.1" },
+    { name = "httpcore", extras = ["asyncio"], marker = "extra == 'asyncio'", specifier = "==1.*" },
     { name = "httpcore", extras = ["http2"], marker = "extra == 'http2'", specifier = "==1.*" },
-    { name = "httpx", marker = "extra == 'httpx'", specifier = ">=0.16.0" },
-    { name = "huey", marker = "extra == 'huey'", specifier = ">=2" },
-    { name = "huggingface-hub", marker = "extra == 'huggingface-hub'", specifier = ">=0.22" },
-    { name = "langchain", marker = "extra == 'langchain'", specifier = ">=0.0.210" },
-    { name = "launchdarkly-server-sdk", marker = "extra == 'launchdarkly'", specifier = ">=9.8.0" },
-    { name = "litestar", marker = "extra == 'litestar'", specifier = ">=2.0.0" },
-    { name = "loguru", marker = "extra == 'loguru'", specifier = ">=0.5" },
     { name = "markupsafe", marker = "extra == 'flask'" },
-    { name = "openai", marker = "extra == 'openai'", specifier = ">=1.0.0" },
-    { name = "openfeature-sdk", marker = "extra == 'openfeature'", specifier = ">=0.7.1" },
-    { name = "opentelemetry-distro", marker = "extra == 'opentelemetry'", specifier = ">=0.35b0" },
-    { name = "opentelemetry-distro", marker = "extra == 'opentelemetry-experimental'" },
+    { name = "opentelemetry-distro", extras = ["otlp"], marker = "extra == 'opentelemetry-otlp'", specifier = ">=0.35b0" },
     { name = "protobuf", marker = "extra == 'grpcio'", specifier = ">=3.8.0" },
     { name = "pure-eval", marker = "extra == 'pure-eval'" },
-    { name = "pymongo", marker = "extra == 'pymongo'", specifier = ">=3.1" },
-    { name = "pyspark", marker = "extra == 'pyspark'", specifier = ">=2.4.4" },
-    { name = "quart", marker = "extra == 'quart'", specifier = ">=0.16.1" },
-    { name = "rq", marker = "extra == 'rq'", specifier = ">=0.6" },
-    { name = "sanic", marker = "extra == 'sanic'", specifier = ">=0.8" },
-    { name = "sqlalchemy", marker = "extra == 'sqlalchemy'", specifier = ">=1.2" },
-    { name = "starlette", marker = "extra == 'starlette'", specifier = ">=0.19.1" },
-    { name = "starlite", marker = "extra == 'starlite'", specifier = ">=1.48" },
-    { name = "statsig", marker = "extra == 'statsig'", specifier = ">=0.55.3" },
-    { name = "tiktoken", marker = "extra == 'openai'", specifier = ">=0.3.0" },
-    { name = "tornado", marker = "extra == 'tornado'", specifier = ">=6" },
-    { name = "unleashclient", marker = "extra == 'unleash'", specifier = ">=6.0.1" },
+    { name = "quart", marker = "extra == 'quart'" },
     { name = "urllib3", specifier = ">=1.26.11" },
 ]
+provides-extras = ["asyncio", "flask", "grpcio", "http2", "opentelemetry-otlp", "pure-eval", "quart"]
 
 [[package]]
 name = "stack-data"
@@ -252,7 +220,7 @@ wheels = [
 ]
 
 [[package]]
-name = "test-logging"
+name = "test"
 version = "0"
 source = { virtual = "." }
 dependencies = [

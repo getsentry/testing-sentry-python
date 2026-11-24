@@ -1,7 +1,9 @@
 import asyncio
 import os
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 import sentry_sdk.traces
 from sentry_sdk.types import Event, Hint, SamplingContext, Breadcrumb, BreadcrumbHint, MonitorConfig, SpanJSON
 from sentry_sdk.crons import MonitorStatus, capture_checkin
@@ -13,10 +15,6 @@ def my_error_sampler(event: Event, hint: Hint) -> float | bool:
 
 def my_traces_sampler(sampling_context: SamplingContext) -> float | bool:
     return 1.0
-
-
-def my_profiles_sampler(sampling_context: SamplingContext) -> float | bool:
-    return True
 
 
 def my_before_send(event: Event, hint: Hint) -> Event | None:
@@ -38,16 +36,15 @@ async def main() -> None:
         dsn=os.getenv("SENTRY_DSN", None),
         environment=os.getenv("ENV", "local"),
         traces_sample_rate=1.0,
-        trace_lifecycle="stream",
-        profiles_sample_rate=1.0,
-        send_default_pii=True,
         debug=True,
         error_sampler=my_error_sampler,
         traces_sampler=my_traces_sampler,
-        profiles_sampler=my_profiles_sampler,
         before_send=my_before_send,
         before_send_span=my_before_send_span,
         before_breadcrumb=my_before_breadcrumb,
+        integrations=[LoggingIntegration(event_level=logging.ERROR, level=None)],
+        data_collection={"stack_frame_variables": {"mode": "denylist"}},
+        attach_stacktrace=False,
     )
 
     my_config: MonitorConfig = {}

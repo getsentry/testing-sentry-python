@@ -5,7 +5,10 @@ requires-python = ">=3.13"
 
 dependencies = [
     "ipdb>=0.13.13",
-    "sentry-sdk[fastapi,asyncpg,rq]",
+    "sentry-sdk>=3.0.0",
+    "asyncpg>=0.23",
+    "fastapi>=0.79.0",
+    "rq>=0.6",
 ]
 
 [tool.uv.sources]

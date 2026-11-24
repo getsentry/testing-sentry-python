@@ -9,7 +9,7 @@ dependencies = [
     "langchain-anthropic>=0.3.12",
     "langchain-community>=0.3.17",
     "langchain-openai>=0.3.7",
-    "sentry-sdk",
+    "sentry-sdk>=3.0.0",
 ]
 
 [tool.uv.sources]

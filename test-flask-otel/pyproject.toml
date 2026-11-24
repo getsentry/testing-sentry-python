@@ -9,7 +9,7 @@ dependencies = [
     "ipdb>=0.13.13",
     "markupsafe>=3.0.2",
     "opentelemetry-distro>=0.52b0",
-    "sentry-sdk[flask]",
+    "sentry-sdk[flask,opentelemetry-otlp]>=3.0.0",
 ]
 
 [tool.uv.sources]

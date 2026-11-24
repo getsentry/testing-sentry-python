@@ -4,9 +4,10 @@ import uuid
 
 from openai import AsyncOpenAI
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 import sentry_sdk.traces
-from sentry_sdk.ai.monitoring import ai_track
 from sentry_sdk.ai.utils import set_conversation_id
 from sentry_sdk.integrations.asyncio import AsyncioIntegration
 from sentry_sdk.integrations.openai import OpenAIIntegration
@@ -87,7 +88,7 @@ async def conversation_b(client, conversation_id: str):
     return "Conversation B complete"
 
 
-@ai_track("Concurrent conversations workflow")
+@sentry_sdk.trace(name="Concurrent conversations workflow", attributes={"sentry.op": "ai.pipeline"})
 async def concurrent_conversations_workflow(client):
     """Two conversations running concurrently with asyncio.gather()."""
     # Generate unique conversation IDs for both sessions
@@ -132,21 +133,20 @@ async def main():
         dsn=os.getenv("SENTRY_DSN", None),
         environment=os.getenv("ENV", "openai-test-conversation-async"),
         traces_sample_rate=1.0,
-        trace_lifecycle="stream",
-        profiles_sample_rate=1.0,
-        send_default_pii=True,
         debug=True,
         before_send_span=before_send_span,
         integrations=[
             AsyncioIntegration(),
             OpenAIIntegration(
-                include_prompts=True,
                 tiktoken_encoding_name="cl100k_base",
             ),
+            LoggingIntegration(event_level=logging.ERROR, level=None),
         ],
         disabled_integrations=[
             StdlibIntegration(),
         ],
+        data_collection={"stack_frame_variables": {"mode": "denylist"}},
+        attach_stacktrace=False,
     )
 
     client = AsyncOpenAI(

@@ -1,7 +1,9 @@
 import os
 from celery import Celery, signals
 from celery.schedules import crontab
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.crons.decorator import monitor
 from sentry_sdk.integrations.celery import CeleryIntegration
 
@@ -13,12 +15,13 @@ app = Celery(__name__, broker='redis://localhost:6379/0')
 def init_sentry(**_kwargs):
     sentry_sdk.init(
         dsn=os.getenv("SENTRY_DSN", None),
-        send_default_pii=True,
         # environment='development',
         # release='unknown',
-        integrations=[CeleryIntegration(monitor_beat_tasks=True)],
+        integrations=[CeleryIntegration(monitor_beat_tasks=True), LoggingIntegration(event_level=logging.ERROR, level=None)],
         # traces_sample_rate=1.0,
         debug=True,
+        data_collection={"stack_frame_variables": {"mode": "denylist"}},
+        attach_stacktrace=False,
     )
 
 

@@ -7,7 +7,7 @@ dependencies = [
     "celery>=5.4.0",
     "ipdb>=0.13.13",
     "redis>=5.2.1",
-    "sentry-sdk[celery]",
+    "sentry-sdk>=3.0.0",
 ]
 
 [tool.uv.sources]
