@@ -1,6 +1,8 @@
 import os
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 import sentry_sdk.traces
 from sentry_sdk.integrations.clickhouse_driver import ClickhouseDriverIntegration
 
@@ -11,10 +13,10 @@ def main():
         "dsn": os.getenv("SENTRY_DSN", None),
         "environment": os.getenv("ENV", "local"),
         "traces_sample_rate": 1.0,
-        "trace_lifecycle": "stream",
-        "send_default_pii": True,
         "debug": True,
-        "integrations": [ClickhouseDriverIntegration()],
+        "integrations": [ClickhouseDriverIntegration(), LoggingIntegration(event_level=logging.ERROR, level=None)],
+        "data_collection": {"stack_frame_variables": {"mode": "denylist"}},
+        "attach_stacktrace": False,
     }
     print(f"Sentry Settings: {sentry_settings}")
 

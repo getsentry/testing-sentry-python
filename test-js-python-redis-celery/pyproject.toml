@@ -8,7 +8,7 @@ dependencies = [
     "fastapi>=0.115.11",
     "ipdb>=0.13.13",
     "redis>=5.2.1",
-    "sentry-sdk[fastapi,celery]",
+    "sentry-sdk>=3.0.0",
     "uvicorn>=0.34.0",
 ]
 

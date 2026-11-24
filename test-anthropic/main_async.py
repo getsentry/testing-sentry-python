@@ -3,13 +3,14 @@ import os
 
 from anthropic import AsyncAnthropic
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 import sentry_sdk.traces
-from sentry_sdk.consts import SPANTEMPLATE
 from sentry_sdk.integrations.anthropic import AnthropicIntegration
 
 
-@sentry_sdk.trace(name="Custom AI Agent", template=SPANTEMPLATE.AI_AGENT)
+@sentry_sdk.trace(name="Custom AI Agent", attributes={"sentry.op": "gen_ai.invoke_agent"})
 async def my_custom_agent(client):
     print("~~~ Starting my_custom_agent ~~~")
 
@@ -51,12 +52,13 @@ async def main():
         dsn=os.getenv("SENTRY_DSN", None),
         environment=os.getenv("ENV", "local"),
         traces_sample_rate=1.0,
-        trace_lifecycle="stream",
-        send_default_pii=True,
         debug=True,
         integrations=[
-            AnthropicIntegration(include_prompts=True),
+            AnthropicIntegration(),
+            LoggingIntegration(event_level=logging.ERROR, level=None),
         ],
+        data_collection={"stack_frame_variables": {"mode": "denylist"}},
+        attach_stacktrace=False,
     )
 
     client = AsyncAnthropic(

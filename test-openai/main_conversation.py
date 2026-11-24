@@ -3,15 +3,16 @@ import uuid
 
 from openai import OpenAI
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 import sentry_sdk.traces
-from sentry_sdk.ai.monitoring import ai_track
 from sentry_sdk.ai.utils import set_conversation_id
 from sentry_sdk.integrations.openai import OpenAIIntegration
 from sentry_sdk.integrations.stdlib import StdlibIntegration
 
 
-@ai_track("Multi-turn conversation workflow")
+@sentry_sdk.trace(name="Multi-turn conversation workflow", attributes={"sentry.op": "ai.pipeline"})
 def conversation_workflow(client):
     # Generate a unique conversation ID for this session
     conversation_id = str(uuid.uuid4())
@@ -69,7 +70,7 @@ def conversation_workflow(client):
         print(f"Turn 3 - Assistant: {assistant_message}")
 
 
-@ai_track("Interleaved conversations workflow")
+@sentry_sdk.trace(name="Interleaved conversations workflow", attributes={"sentry.op": "ai.pipeline"})
 def interleaved_conversations_workflow(client):
     """Two conversations happening simultaneously, interleaved."""
     # Generate unique conversation IDs for both sessions
@@ -173,20 +174,19 @@ def main():
         dsn=os.getenv("SENTRY_DSN", None),
         environment=os.getenv("ENV", "openai-test-conversation"),
         traces_sample_rate=1.0,
-        trace_lifecycle="stream",
-        profiles_sample_rate=1.0,
-        send_default_pii=True,
         debug=True,
         before_send_span=before_send_span,
         integrations=[
             OpenAIIntegration(
-                include_prompts=True,
                 tiktoken_encoding_name="cl100k_base",
             ),
+            LoggingIntegration(event_level=logging.ERROR, level=None),
         ],
         disabled_integrations=[
             StdlibIntegration(),
         ],
+        data_collection={"stack_frame_variables": {"mode": "denylist"}},
+        attach_stacktrace=False,
     )
 
     client = OpenAI(

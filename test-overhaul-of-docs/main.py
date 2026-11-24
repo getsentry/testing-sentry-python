@@ -3,7 +3,9 @@ import os
 # import httpx
 import pymongo
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 # from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 # from sentry_sdk.integrations.asyncio import AsyncioIntegration
 # from sentry_sdk.integrations.loguru import LoguruIntegration
@@ -477,8 +479,21 @@ def main():
         "traces_sample_rate": 1.0,
         # "send_default_pii": True,
         "debug": True,
-        "trace_lifecycle": "stream",
-        "integrations": [],
+        "integrations": [LoggingIntegration(event_level=logging.ERROR, level=None)],
+        "data_collection": {
+            "user_info": False,
+            "http_bodies": ["incoming_request"],
+            "graphql": {"document": False, "variables": False},
+            "gen_ai": {"inputs": False, "outputs": False},
+            "mcp": {"inputs": False, "outputs": False},
+            "database_query_data": False,
+            "queues": False,
+            "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+            "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "stack_frame_variables": {"mode": "denylist"},
+        },
+        "attach_stacktrace": False,
     }
     print(f"Sentry Settings: {sentry_settings}")
     sentry_sdk.init(**sentry_settings)

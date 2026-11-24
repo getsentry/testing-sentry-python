@@ -2,6 +2,7 @@ import os
 
 import asyncpg
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 from fastapi import FastAPI
 from sentry_sdk.integrations.asyncpg import AsyncPGIntegration
 from sentry_sdk.integrations.fastapi import FastApiIntegration
@@ -21,27 +22,25 @@ DATABASE_URL = f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST
 
 
 # This multiline string simulates what a user would copy from the Sentry UI
-# "Traces" page and paste into their before_send_transaction callback.
+# "Traces" page and paste into their ignore_spans rule.
 # The Sentry UI displays the span description (the SQL query) with its
 # original newlines/whitespace intact.
 QUERY_TO_FILTER = "SELECT u.id, u.name, u.email, p.title AS post_title, p.created_at AS post_date FROM users u JOIN posts p ON u.id = p.user_id WHERE u.active = true ORDER BY p.created_at DESC"
 
-def before_send_transaction(event, hint):
+def before_send_span(span, hint):
     """
-    User's before_send_transaction callback that attempts to filter out
-    transactions containing a specific multiline SQL query.
+    Logs whether a database span matches the query the user wants to filter.
 
-    The user copied the query string from the Sentry UI Traces page
-    and wants to drop transactions that contain this query as a span.
+    The user copied the query string from the Sentry UI Traces page. Spans can't
+    be dropped here, so the actual filtering is the `ignore_spans` rule below.
     """
-    for span in event.get("spans", []):
-        description = span.get("description", "")
-        if description and QUERY_TO_FILTER in description:
-            logger.info(f"[before_send_transaction] MATCH FOUND - dropping transaction")
-            return None
+    if str(span.get("attributes", {}).get("sentry.op", "")).startswith("db"):
+        if QUERY_TO_FILTER in span.get("name", ""):
+            logger.info("[before_send_span] MATCH FOUND")
+        else:
+            logger.info("[before_send_span] No match found")
 
-    logger.info(f"[before_send_transaction] No match found - keeping transaction")
-    return event
+    return span
 
 
 sentry_sdk.init(
@@ -49,12 +48,28 @@ sentry_sdk.init(
     environment=os.environ.get("ENV", "local"),
     traces_sample_rate=1.0,
     debug=True,
+    before_send_span=before_send_span,
+    ignore_spans=[QUERY_TO_FILTER],
     integrations=[
         StarletteIntegration(),
         FastApiIntegration(),
         AsyncPGIntegration(),
+        LoggingIntegration(event_level=logging.ERROR, level=None),
     ],
-    before_send_transaction=before_send_transaction,
+    data_collection={
+        "user_info": False,
+        "http_bodies": ["incoming_request"],
+        "graphql": {"document": False, "variables": False},
+        "gen_ai": {"inputs": False, "outputs": False},
+        "mcp": {"inputs": False, "outputs": False},
+        "database_query_data": False,
+        "queues": False,
+        "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+        "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "stack_frame_variables": {"mode": "denylist"},
+    },
+    attach_stacktrace=False,
 )
 
 app = FastAPI()

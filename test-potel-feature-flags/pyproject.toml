@@ -8,7 +8,7 @@ dependencies = [
     "ipdb>=0.13.13",
     "launchdarkly-server-sdk>=9.11.0",
     "requests>=2.32.3",
-    "sentry-sdk[launchdarkly]",
+    "sentry-sdk>=3.0.0",
     "uvicorn>=0.34.2",
 ]
 

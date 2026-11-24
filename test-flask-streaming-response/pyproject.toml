@@ -9,7 +9,7 @@ dependencies = [
     "gunicorn>=23.0.0",
     "ipdb>=0.13.13",
     "markupsafe>=3.0.2",
-    "sentry-sdk[flask]",
+    "sentry-sdk[flask]>=3.0.0",
 ]
 
 [tool.uv.sources]

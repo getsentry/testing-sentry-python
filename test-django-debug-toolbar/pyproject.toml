@@ -8,7 +8,7 @@ dependencies = [
     "django-debug-toolbar>=5.0.1",
     "ipdb>=0.13.13",
     "psycopg>=3.2.6",
-    "sentry-sdk[django]",
+    "sentry-sdk>=3.0.0",
     "strawberry-graphql>=0.243.0",
     "strawberry-graphql-django>=0.51.1",
 ]

@@ -126,7 +126,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # Setting up Sentry
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.threading import ThreadingIntegration
 
@@ -138,9 +140,23 @@ sentry_sdk.init(
         middleware_spans=False,
         signals_spans=False,
         cache_spans=False,
-    )],
+    ), LoggingIntegration(event_level=logging.ERROR, level=None)],
     disabled_integrations=[
         ThreadingIntegration(),
     ],
     debug=True,
+    data_collection={
+        "user_info": False,
+        "http_bodies": ["incoming_request"],
+        "graphql": {"document": False, "variables": False},
+        "gen_ai": {"inputs": False, "outputs": False},
+        "mcp": {"inputs": False, "outputs": False},
+        "database_query_data": False,
+        "queues": False,
+        "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+        "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "stack_frame_variables": {"mode": "denylist"},
+    },
+    attach_stacktrace=False,
 )

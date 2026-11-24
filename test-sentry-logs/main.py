@@ -1,7 +1,9 @@
 import os
 import random
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 import sentry_sdk.logger
 
 
@@ -17,10 +19,22 @@ sentry_sdk.init(
     environment=os.environ.get("ENV", "test"),
     traces_sample_rate=1.0,
     debug=True,
-    _experiments={
-        "enable_logs": True,
-        "before_send_log": before_log,
+    before_send_log=before_log,
+    integrations=[LoggingIntegration(event_level=logging.ERROR)],
+    data_collection={
+        "user_info": False,
+        "http_bodies": [],
+        "graphql": {"document": False, "variables": False},
+        "gen_ai": {"inputs": False, "outputs": False},
+        "mcp": {"inputs": False, "outputs": False},
+        "database_query_data": False,
+        "queues": False,
+        "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+        "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "stack_frame_variables": {"mode": "denylist"},
     },
+    attach_stacktrace=False,
 )
 
 

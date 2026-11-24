@@ -5,7 +5,9 @@ from google.genai import types
 from google.genai.types import HttpOptions
 import os
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.google_genai import GoogleGenAIIntegration
 
 load_dotenv()
@@ -14,10 +16,11 @@ sentry_sdk.init(
     dsn=os.environ["SENTRY_DSN"],
     # Add data like request headers and IP for users,
     # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
-    send_default_pii=True,
     traces_sample_rate=1.0,
-    integrations=[GoogleGenAIIntegration()],
+    integrations=[GoogleGenAIIntegration(), LoggingIntegration(event_level=logging.ERROR, level=None)],
     debug=True,
+    data_collection={"stack_frame_variables": {"mode": "denylist"}},
+    attach_stacktrace=False,
 )
 
 aclient = genai.Client(
@@ -38,7 +41,7 @@ def get_current_weather(location: str) -> str:
 
 
 async def main():
-    with sentry_sdk.start_transaction(op="async-test-transaction", name="async-test"):
+    with sentry_sdk.start_span(name="async-test", attributes={"sentry.op": "async-test-transaction"}):
         response = await aclient.models.generate_content(
             model="gemini-2.5-flash",
             contents="What is weather like in Boston, MA?",

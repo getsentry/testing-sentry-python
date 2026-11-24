@@ -1,5 +1,5 @@
 version = 1
-revision = 1
+revision = 3
 requires-python = ">=3.13"
 
 [[package]]
@@ -45,18 +45,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/91/50/a9d80c47ff289c611ff12e63f7c5d13942c65d68125160cefd768c73e6e4/executing-2.2.0.tar.gz", hash = "sha256:5d108c028108fe2551d1a7b2e8b713341e2cb4fc0aa7dcf966fa4327a5226755", size = 978693 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7b/8f/c4d9bafc34ad7ad5d8dc16dd1347ee0e507a52c3adb6bfa8887e1c6a26ba/executing-2.2.0-py2.py3-none-any.whl", hash = "sha256:11387150cad388d62750327a53d3339fad4888b39a6fe233c3afbb54ecffd3aa", size = 26702 },
-]
-
-[[package]]
-name = "importlib-metadata"
-version = "8.7.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "zipp" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/76/66/650a33bd90f786193e4de4b3ad86ea60b53c89b669a5c7be931fac31cdb0/importlib_metadata-8.7.0.tar.gz", hash = "sha256:d13b81ad223b890aa16c5471f2ac3056cf76c5f10f82d6f9292f0b415f389000", size = 56641 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/20/b0/36bd937216ec521246249be3bf9855081de4c5e06a0c9b4219dbeda50373/importlib_metadata-8.7.0-py3-none-any.whl", hash = "sha256:e5dd1551894c77868a30651cef00984d50e1002d06942a7101d34870c5f02afd", size = 27656 },
 ]
 
 [[package]]
@@ -130,46 +118,6 @@ wheels = [
 ]
 
 [[package]]
-name = "opentelemetry-api"
-version = "1.36.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "importlib-metadata" },
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/27/d2/c782c88b8afbf961d6972428821c302bd1e9e7bc361352172f0ca31296e2/opentelemetry_api-1.36.0.tar.gz", hash = "sha256:9a72572b9c416d004d492cbc6e61962c0501eaf945ece9b5a0f56597d8348aa0", size = 64780 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/bb/ee/6b08dde0a022c463b88f55ae81149584b125a42183407dc1045c486cc870/opentelemetry_api-1.36.0-py3-none-any.whl", hash = "sha256:02f20bcacf666e1333b6b1f04e647dc1d5111f86b8e510238fcc56d7762cda8c", size = 65564 },
-]
-
-[[package]]
-name = "opentelemetry-sdk"
-version = "1.36.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-semantic-conventions" },
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/4c/85/8567a966b85a2d3f971c4d42f781c305b2b91c043724fa08fd37d158e9dc/opentelemetry_sdk-1.36.0.tar.gz", hash = "sha256:19c8c81599f51b71670661ff7495c905d8fdf6976e41622d5245b791b06fa581", size = 162557 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/0b/59/7bed362ad1137ba5886dac8439e84cd2df6d087be7c09574ece47ae9b22c/opentelemetry_sdk-1.36.0-py3-none-any.whl", hash = "sha256:19fe048b42e98c5c1ffe85b569b7073576ad4ce0bcb6e9b4c6a39e890a6c45fb", size = 119995 },
-]
-
-[[package]]
-name = "opentelemetry-semantic-conventions"
-version = "0.57b0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/7e/31/67dfa252ee88476a29200b0255bda8dfc2cf07b56ad66dc9a6221f7dc787/opentelemetry_semantic_conventions-0.57b0.tar.gz", hash = "sha256:609a4a79c7891b4620d64c7aac6898f872d790d75f22019913a660756f27ff32", size = 124225 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/05/75/7d591371c6c39c73de5ce5da5a2cc7b72d1d1cd3f8f4638f553c01c37b11/opentelemetry_semantic_conventions-0.57b0-py3-none-any.whl", hash = "sha256:757f7e76293294f124c827e514c2a3144f191ef175b069ce8d1211e1e38e9e78", size = 201627 },
-]
-
-[[package]]
 name = "parso"
 version = "0.8.4"
 source = { registry = "https://pypi.org/simple" }
@@ -231,66 +179,32 @@ wheels = [
 
 [[package]]
 name = "sentry-sdk"
-version = "3.0.0a5"
+version = "3.0.0"
 source = { editable = "../../sentry-python" }
 dependencies = [
     { name = "certifi" },
-    { name = "opentelemetry-sdk" },
     { name = "urllib3" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "aiohttp", marker = "extra == 'aiohttp'", specifier = ">=3.5" },
-    { name = "anthropic", marker = "extra == 'anthropic'", specifier = ">=0.16" },
-    { name = "apache-beam", marker = "extra == 'beam'", specifier = ">=2.12" },
-    { name = "arq", marker = "extra == 'arq'", specifier = ">=0.23" },
     { name = "asttokens", marker = "extra == 'pure-eval'" },
-    { name = "asyncpg", marker = "extra == 'asyncpg'", specifier = ">=0.23" },
     { name = "blinker", marker = "extra == 'flask'", specifier = ">=1.1" },
     { name = "blinker", marker = "extra == 'quart'", specifier = ">=1.1" },
-    { name = "bottle", marker = "extra == 'bottle'", specifier = ">=0.12.13" },
-    { name = "celery", marker = "extra == 'celery'", specifier = ">=3" },
-    { name = "celery-redbeat", marker = "extra == 'celery-redbeat'", specifier = ">=2" },
     { name = "certifi" },
-    { name = "chalice", marker = "extra == 'chalice'", specifier = ">=1.16.0" },
-    { name = "clickhouse-driver", marker = "extra == 'clickhouse-driver'", specifier = ">=0.2.0" },
-    { name = "django", marker = "extra == 'django'", specifier = ">=1.8" },
     { name = "executing", marker = "extra == 'pure-eval'" },
-    { name = "falcon", marker = "extra == 'falcon'", specifier = ">=1.4" },
-    { name = "fastapi", marker = "extra == 'fastapi'", specifier = ">=0.79.0" },
-    { name = "flask", marker = "extra == 'flask'", specifier = ">=0.11" },
+    { name = "flask", marker = "extra == 'flask'" },
     { name = "grpcio", marker = "extra == 'grpcio'", specifier = ">=1.21.1" },
+    { name = "httpcore", extras = ["asyncio"], marker = "extra == 'asyncio'", specifier = "==1.*" },
     { name = "httpcore", extras = ["http2"], marker = "extra == 'http2'", specifier = "==1.*" },
-    { name = "httpx", marker = "extra == 'httpx'", specifier = ">=0.16.0" },
-    { name = "huey", marker = "extra == 'huey'", specifier = ">=2" },
-    { name = "huggingface-hub", marker = "extra == 'huggingface-hub'", specifier = ">=0.22" },
-    { name = "langchain", marker = "extra == 'langchain'", specifier = ">=0.0.210" },
-    { name = "launchdarkly-server-sdk", marker = "extra == 'launchdarkly'", specifier = ">=9.8.0" },
-    { name = "litestar", marker = "extra == 'litestar'", specifier = ">=2.0.0" },
-    { name = "loguru", marker = "extra == 'loguru'", specifier = ">=0.5" },
     { name = "markupsafe", marker = "extra == 'flask'" },
-    { name = "openai", marker = "extra == 'openai'", specifier = ">=1.0.0" },
-    { name = "openfeature-sdk", marker = "extra == 'openfeature'", specifier = ">=0.7.1" },
-    { name = "opentelemetry-distro", marker = "extra == 'opentelemetry'", specifier = ">=0.35b0" },
-    { name = "opentelemetry-sdk", specifier = ">=1.4.0" },
+    { name = "opentelemetry-distro", extras = ["otlp"], marker = "extra == 'opentelemetry-otlp'", specifier = ">=0.35b0" },
     { name = "protobuf", marker = "extra == 'grpcio'", specifier = ">=3.8.0" },
     { name = "pure-eval", marker = "extra == 'pure-eval'" },
-    { name = "pymongo", marker = "extra == 'pymongo'", specifier = ">=3.1" },
-    { name = "pyspark", marker = "extra == 'pyspark'", specifier = ">=2.4.4" },
-    { name = "quart", marker = "extra == 'quart'", specifier = ">=0.16.1" },
-    { name = "rq", marker = "extra == 'rq'", specifier = ">=0.6" },
-    { name = "sanic", marker = "extra == 'sanic'", specifier = ">=0.8" },
-    { name = "sqlalchemy", marker = "extra == 'sqlalchemy'", specifier = ">=1.2" },
-    { name = "starlette", marker = "extra == 'starlette'", specifier = ">=0.19.1" },
-    { name = "starlite", marker = "extra == 'starlite'", specifier = ">=1.48" },
-    { name = "statsig", marker = "extra == 'statsig'", specifier = ">=0.55.3" },
-    { name = "tiktoken", marker = "extra == 'openai'", specifier = ">=0.3.0" },
-    { name = "tornado", marker = "extra == 'tornado'", specifier = ">=6" },
-    { name = "unleashclient", marker = "extra == 'unleash'", specifier = ">=6.0.1" },
+    { name = "quart", marker = "extra == 'quart'" },
     { name = "urllib3", specifier = ">=1.26.11" },
 ]
-provides-extras = ["aiohttp", "anthropic", "arq", "asyncpg", "beam", "bottle", "celery", "celery-redbeat", "chalice", "clickhouse-driver", "django", "falcon", "fastapi", "flask", "grpcio", "http2", "httpx", "huey", "huggingface-hub", "langchain", "launchdarkly", "litestar", "loguru", "openai", "openfeature", "opentelemetry", "pure-eval", "pymongo", "pyspark", "quart", "rq", "sanic", "sqlalchemy", "starlette", "starlite", "statsig", "tornado", "unleash"]
+provides-extras = ["asyncio", "flask", "grpcio", "http2", "opentelemetry-otlp", "pure-eval", "quart"]
 
 [[package]]
 name = "stack-data"
@@ -331,15 +245,6 @@ wheels = [
 ]
 
 [[package]]
-name = "typing-extensions"
-version = "4.14.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/98/5a/da40306b885cc8c09109dc2e1abd358d5684b1425678151cdaed4731c822/typing_extensions-4.14.1.tar.gz", hash = "sha256:38b39f4aeeab64884ce9f74c94263ef78f3c22467c8724005483154c26648d36", size = 107673 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b5/00/d631e67a838026495268c2f6884f3711a15a9a2a96cd244fdaea53b823fb/typing_extensions-4.14.1-py3-none-any.whl", hash = "sha256:d1e1e3b58374dc93031d6eda2420a48ea44a36c2b4766a4fdeb3710755731d76", size = 43906 },
-]
-
-[[package]]
 name = "urllib3"
 version = "2.5.0"
 source = { registry = "https://pypi.org/simple" }
@@ -357,11 +262,3 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/fd/84/fd2ba7aafacbad3c4201d395674fc6348826569da3c0937e75505ead3528/wcwidth-0.2.13-py2.py3-none-any.whl", hash = "sha256:3da69048e4540d84af32131829ff948f1e022c1c6bdb8d6102117aac784f6859", size = 34166 },
 ]
 
-[[package]]
-name = "zipp"
-version = "3.23.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e3/02/0f2892c661036d50ede074e376733dca2ae7c6eb617489437771209d4180/zipp-3.23.0.tar.gz", hash = "sha256:a07157588a12518c9d4034df3fbbee09c814741a33ff63c05fa29d26a2404166", size = 25547 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/2e/54/647ade08bf0db230bfea292f893923872fd20be6ac6f53b2b936ba839d75/zipp-3.23.0-py3-none-any.whl", hash = "sha256:071652d6115ed432f5ce1d34c336c0adfd6a884660d1e9712a256d3d3bd4b14e", size = 10276 },
-]

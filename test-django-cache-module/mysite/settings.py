@@ -148,19 +148,32 @@ CACHES = {
 
 # Sentry
 import os
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 
 sentry_sdk.init(
     dsn=os.environ.get("SENTRY_DSN"),
     integrations=[DjangoIntegration(
-        transaction_style="url",
         signals_spans=False,
         cache_spans=False,
-    )],
+    ), LoggingIntegration(event_level=logging.ERROR, level=None)],
     traces_sample_rate=1.0,
-    send_default_pii=False,
-    enable_tracing=True,
     keep_alive=True,
     debug=True,  # This is true in this case
+    data_collection={
+        "user_info": False,
+        "http_bodies": ["incoming_request"],
+        "graphql": {"document": False, "variables": False},
+        "gen_ai": {"inputs": False, "outputs": False},
+        "mcp": {"inputs": False, "outputs": False},
+        "database_query_data": False,
+        "queues": False,
+        "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+        "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "stack_frame_variables": {"mode": "denylist"},
+    },
+    attach_stacktrace=False,
 )

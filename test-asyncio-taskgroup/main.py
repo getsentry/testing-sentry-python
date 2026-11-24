@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 import os
 import random
 
@@ -15,6 +16,7 @@ from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
+from sentry_sdk.integrations.otlp import OTLPIntegration
 
 
 def before_send(event, hint):
@@ -29,17 +31,30 @@ def before_send(event, hint):
 sentry_sdk.init(
     dsn=os.getenv("SENTRY_DSN", None),
     environment=os.getenv("ENV", "local"),
-    traces_sample_rate=1.0,
     debug=True,
-    instrumenter="otel",
     before_send=before_send,
     integrations=[
-        LoggingIntegration(event_level=None, level=None),
-        StarletteIntegration(transaction_style="endpoint"),
-        FastApiIntegration(transaction_style="endpoint"),
+        OTLPIntegration(setup_propagator=True),
+        LoggingIntegration(breadcrumb_level=None, event_level=None, level=None),
+        StarletteIntegration(),
+        FastApiIntegration(),
         AsyncioIntegration(),
         AioHttpIntegration(),
     ],
+    data_collection={
+        "user_info": False,
+        "http_bodies": ["incoming_request"],
+        "graphql": {"document": False, "variables": False},
+        "gen_ai": {"inputs": False, "outputs": False},
+        "mcp": {"inputs": False, "outputs": False},
+        "database_query_data": False,
+        "queues": False,
+        "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+        "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "stack_frame_variables": {"mode": "denylist"},
+    },
+    attach_stacktrace=False,
 )
 
 
@@ -71,16 +86,5 @@ async def fake_ai_streaming_response():
 async def main():
     return StreamingResponse(fake_ai_streaming_response())
 
-
-# Setup Sentry with OpenTelemetry
-from opentelemetry import trace
-from opentelemetry.propagate import set_global_textmap
-from opentelemetry.sdk.trace import TracerProvider
-from sentry_sdk.integrations.opentelemetry import SentrySpanProcessor, SentryPropagator
-
-provider = TracerProvider()
-provider.add_span_processor(SentrySpanProcessor())
-trace.set_tracer_provider(provider)
-set_global_textmap(SentryPropagator())
 
 FastAPIInstrumentor.instrument_app(app)

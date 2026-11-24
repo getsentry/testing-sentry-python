@@ -5,23 +5,35 @@ from random import randint
 from flask import Flask, request
 
 from opentelemetry import trace
-from opentelemetry.propagate import set_global_textmap
 
 import sentry_sdk
-from sentry_sdk.integrations.opentelemetry import SentrySpanProcessor, SentryPropagator
+from sentry_sdk.integrations.logging import LoggingIntegration
+from sentry_sdk.integrations.otlp import OTLPIntegration
 
 
 sentry_sdk.init(
     dsn=os.environ["SENTRY_DSN"],
-    enable_tracing=True,
-    # set the instrumenter to use OpenTelemetry instead of Sentry
-    instrumenter="otel",
+    # send OpenTelemetry spans to Sentry instead of using Sentry's own tracing
+    integrations=[
+        OTLPIntegration(setup_propagator=True),
+        LoggingIntegration(event_level=logging.ERROR, level=None),
+    ],
+    data_collection={
+        "user_info": False,
+        "http_bodies": ["incoming_request"],
+        "graphql": {"document": False, "variables": False},
+        "gen_ai": {"inputs": False, "outputs": False},
+        "mcp": {"inputs": False, "outputs": False},
+        "database_query_data": False,
+        "queues": False,
+        "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+        "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "stack_frame_variables": {"mode": "denylist"},
+    },
+    attach_stacktrace=False,
     debug=True,
 )
-
-provider = trace.get_tracer_provider()
-provider.add_span_processor(SentrySpanProcessor())
-set_global_textmap(SentryPropagator())
 
 # Acquire a tracer
 tracer = trace.get_tracer("diceroller.tracer")

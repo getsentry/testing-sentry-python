@@ -2,7 +2,9 @@ import datetime
 
 import os
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 import sentry_sdk.traces
 
 from tasks import task_a, task_b
@@ -13,10 +15,11 @@ def main():
         "dsn": os.getenv("SENTRY_DSN", None),
         "environment": os.getenv("ENV", "local"),
         "traces_sample_rate": 1.0,
-        "trace_lifecycle": "stream",
-        "send_default_pii": True,
         "debug": True,
         # "integrations": [],
+        "integrations": [LoggingIntegration(event_level=logging.ERROR, level=None)],
+        "data_collection": {"stack_frame_variables": {"mode": "denylist"}},
+        "attach_stacktrace": False,
     }
     print(f"Sentry Settings: {sentry_settings}")
 

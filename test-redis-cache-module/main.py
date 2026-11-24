@@ -3,7 +3,9 @@ import random
 
 import redis
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
 
 
@@ -13,20 +15,22 @@ COUNT = 15
 def init_sentry():  
     sentry_sdk.init(
         dsn=os.environ.get("SENTRY_DSN"),
-        enable_tracing=True,
+        traces_sample_rate=1.0,
         debug=True,
-        send_default_pii=True,
         integrations=[
             RedisIntegration(
                 cache_prefixes=["key1", "key3", "key5", "key7", "key9"]
             ), 
+            LoggingIntegration(event_level=logging.ERROR, level=None),
         ],
+        data_collection={"stack_frame_variables": {"mode": "denylist"}},
+        attach_stacktrace=False,
     )
 
 def main():
     init_sentry()
 
-    with sentry_sdk.start_transaction(name="redis-caching"):
+    with sentry_sdk.start_span(name="redis-caching"):
         r = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
         items = [str(hash(str(x)))*LEN for x in random.sample(range(1, COUNT*5), COUNT)]

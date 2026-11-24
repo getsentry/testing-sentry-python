@@ -2,7 +2,9 @@ from fastapi import FastAPI, Depends, HTTPException
 import os
 from contextlib import asynccontextmanager
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.asyncio import AsyncioIntegration
@@ -18,7 +20,8 @@ async def lifespan(app: FastAPI):
         dsn=os.environ.get("SENTRY_DSN"),
         environment=os.environ.get("ENV", "test"),
         traces_sample_rate=1.0,
-        profiles_sample_rate=1.0,
+        profile_session_sample_rate=1.0,
+        profile_lifecycle="trace",
         release="1.0.0",
         debug=True,
         _experiments={
@@ -29,7 +32,22 @@ async def lifespan(app: FastAPI):
             StarletteIntegration(),
             FastApiIntegration(),
             AsyncioIntegration(),
+            LoggingIntegration(event_level=logging.ERROR, level=None),
         ],
+        data_collection={
+            "user_info": False,
+            "http_bodies": ["incoming_request"],
+            "graphql": {"document": False, "variables": False},
+            "gen_ai": {"inputs": False, "outputs": False},
+            "mcp": {"inputs": False, "outputs": False},
+            "database_query_data": False,
+            "queues": False,
+            "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+            "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+            "stack_frame_variables": {"mode": "denylist"},
+        },
+        attach_stacktrace=False,
     )
     # Verify transport type
     client = sentry_sdk.get_client()

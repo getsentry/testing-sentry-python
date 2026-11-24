@@ -5,7 +5,9 @@ import random
 from celery import Celery, signals
 from celery.schedules import crontab
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.celery import CeleryIntegration
 
 
@@ -24,10 +26,10 @@ def connect_sentry(**kwargs):
         "environment": os.getenv("ENV", "celery.consumer"),
         "release": "0.0.0",
         "traces_sample_rate": 1.0,
-        "trace_lifecycle": "stream",
-        "send_default_pii": True,
         "debug": True,
-        "integrations": [CeleryIntegration()],
+        "integrations": [CeleryIntegration(), LoggingIntegration(event_level=logging.ERROR, level=None)],
+        "data_collection": {"stack_frame_variables": {"mode": "denylist"}},
+        "attach_stacktrace": False,
     }
     print(f"Sentry Settings: {sentry_settings}")
     sentry_sdk.init(**sentry_settings)

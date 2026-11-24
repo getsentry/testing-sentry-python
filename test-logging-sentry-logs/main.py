@@ -3,7 +3,7 @@ import os
 
 import sentry_sdk
 from sentry_sdk.integrations.logging import LoggingIntegration
-import sentry_sdk._experimental_logger as sentry_logger
+from sentry_sdk import logger as sentry_logger
 
 import logging
 logger = logging.getLogger()
@@ -19,22 +19,20 @@ async def main():
         environment=os.getenv("ENV", "local"),
         integrations=[
             LoggingIntegration(
-                level=logging.DEBUG,
+                breadcrumb_level=logging.DEBUG,
                 event_level=logging.ERROR,
-                sentry_logs_level=logging.WARNING,
+                level=logging.WARNING,
             ),
         ],
-        _experiments={
-            "enable_sentry_logs": True,
-        },
         traces_sample_rate=1.0,
-        send_default_pii=True,
         debug=True,
+        data_collection={"stack_frame_variables": {"mode": "denylist"}},
+        attach_stacktrace=False,
     )
 
     my_value = "SomeStringValue"
 
-    with sentry_sdk.start_transaction(op="function", name="logging-transaction"):
+    with sentry_sdk.start_span(name="logging-transaction", attributes={"sentry.op": "function"}):
         sentry_logger.debug("Calling API directly. Thats the status: {my_status} / and the value: {my_value}", my_status=200, my_value="some value")
 
         logger.critical("Using integration and setting stack_info, stacklevel, and extra[my_status, my_value]. %s", my_value, stack_info=True, stacklevel=2, extra={"my_status": 200, "my_value": "some value"})

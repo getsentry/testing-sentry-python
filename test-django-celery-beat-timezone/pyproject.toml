@@ -11,7 +11,8 @@ dependencies = [
     "ipdb>=0.13.13",
     "psycopg>=3.2.6",
     "redis>=5.2.1",
-    "sentry-sdk[django,celery]",
+    "sentry-sdk>=3.0.0",
+    "celery>=3",
 ]
 
 [tool.uv.sources]

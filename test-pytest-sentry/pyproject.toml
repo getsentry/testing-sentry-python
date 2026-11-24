@@ -1,13 +1,13 @@
 [project]
 name = "test"
 version = "0"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 
 dependencies = [
     "ipdb>=0.13.13",
     "pytest-rerunfailures>=15.0",
     "pytest-sentry",
-    "sentry-sdk==3.0.0a2",
+    "sentry-sdk==3.0.0",
 ]
 
 [tool.uv.sources]

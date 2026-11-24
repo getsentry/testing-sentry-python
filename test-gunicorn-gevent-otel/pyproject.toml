@@ -9,7 +9,7 @@ dependencies = [
     "ipdb>=0.13.13",
     "opentelemetry-distro>=0.52b0",
     "opentelemetry-exporter-otlp-proto-http>=1.31.0",
-    "sentry-sdk",
+    "sentry-sdk>=3.0.0",
 ]
 
 [tool.uv.sources]

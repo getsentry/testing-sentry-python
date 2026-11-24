@@ -1,6 +1,8 @@
 import os
 
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.consts import VERSION as SENTRY_SDK_VERSION
 from sentry_sdk.integrations.celery import CeleryIntegration
 
@@ -18,21 +20,18 @@ def main():
         release=SENTRY_SDK_VERSION,
         integrations=[
             CeleryIntegration(monitor_beat_tasks=True, exclude_beat_tasks=exclude_beat_tasks),
+            LoggingIntegration(event_level=logging.ERROR),
         ],
         traces_sample_rate=1.0,
-        profiles_sample_rate=1.0,
+        profile_session_sample_rate=1.0,
+        profile_lifecycle="trace",
         debug=True,
-        _experiments={
-            "enable_logs": True,
-        },
         spotlight="http://localhost:9999/api/0/envelope/",
-        # Continuous Profiling (comment out profiles_sample_rate if you enable this)
-        # profile_session_sample_rate=1.0,
-        # profile_lifecycle="trace",
-        send_default_pii=True,
+        data_collection={"stack_frame_variables": {"mode": "denylist"}},
+        attach_stacktrace=False,
     )
 
-    with sentry_sdk.start_transaction(op="function", name="celery-task-started-from-transaction"):
+    with sentry_sdk.start_span(name="celery-task-started-from-transaction", attributes={"sentry.op": "function"}):
         task_a.delay("Task A from main (via delay)")
         # task_b.apply_async(("Task B from main (via apply_async)", ), headers={"sentry-propagate-traces": False})
 

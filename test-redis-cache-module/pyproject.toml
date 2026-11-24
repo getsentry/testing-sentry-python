@@ -9,7 +9,7 @@ dependencies = [
     "matplotlib>=3.10.1",
     "memory-profiler>=0.61.0",
     "redis>=5.2.1",
-    "sentry-sdk",
+    "sentry-sdk>=3.0.0",
 ]
 
 [tool.uv.sources]

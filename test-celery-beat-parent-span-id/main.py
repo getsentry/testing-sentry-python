@@ -9,16 +9,18 @@ from tasks import my_task
 logger = logging.getLogger('warn.logger')
 
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.celery import CeleryIntegration
 sentry_sdk.init(
     dsn=os.environ.get("SENTRY_DSN"),
-    enable_tracing=True,
-    trace_lifecycle="stream",
+    traces_sample_rate=1.0,
     debug=True,
-    send_default_pii=True,
     integrations=[
-        CeleryIntegration(propagate_traces=False)
-    ]
+        CeleryIntegration(propagate_traces=False),
+        LoggingIntegration(event_level=logging.ERROR, level=None),
+    ],
+    data_collection={"stack_frame_variables": {"mode": "denylist"}},
+    attach_stacktrace=False,
 )
 
 from sentry_sdk.integrations.atexit import AtexitIntegration
@@ -55,8 +57,22 @@ sentry_sdk.init(
         DedupeIntegration(),
         AtexitIntegration(),
         ModulesIntegration(),
-        LoggingIntegration(level=None, event_level=logging.WARNING),
+        LoggingIntegration(breadcrumb_level=None, event_level=logging.WARNING, level=None),
     ],
+    data_collection={
+        "user_info": False,
+        "http_bodies": ["incoming_request"],
+        "graphql": {"document": False, "variables": False},
+        "gen_ai": {"inputs": False, "outputs": False},
+        "mcp": {"inputs": False, "outputs": False},
+        "database_query_data": False,
+        "queues": False,
+        "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+        "cookies": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "url_query_params": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]},
+        "stack_frame_variables": {"mode": "denylist"},
+    },
+    attach_stacktrace=False,
 )
 app = Flask(__name__)
 

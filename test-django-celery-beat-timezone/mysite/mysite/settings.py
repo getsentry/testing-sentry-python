@@ -134,11 +134,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # # Setting up Sentry
+import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 sentry_sdk.init(
     dsn=os.environ.get("SENTRY_DSN"),
-    enable_tracing=True,
+    traces_sample_rate=1.0,
     debug=True,
-    send_default_pii=True,
+    integrations=[LoggingIntegration(event_level=logging.ERROR, level=None)],
+    data_collection={"stack_frame_variables": {"mode": "denylist"}},
+    attach_stacktrace=False,
 )
